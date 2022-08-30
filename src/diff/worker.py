@@ -33,19 +33,19 @@ class Worker:
                 self.sess.commit()
 
                 try:
-                    print(
-                        f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
-                    )
-                    result = gen.generate(
-                        request.prompt,
-                        cols=self.config.cols,
-                        rows=self.config.rows,
-                        inference_steps=self.config.inference_steps)
-                    images = result.save(request.id, str(task.id),
-                                         self.output_dir)
+                    for it in range(self.config.batch_size):
+                        print(
+                            f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}. {it + 1}/{self.config.batch_size}"
+                        )
+                        result = gen.generate(
+                            request.prompt,
+                            cols=self.config.cols,
+                            rows=self.config.rows,
+                            inference_steps=self.config.inference_steps)
+                        images = result.save(request.prompt, task.id, it + 1, self.output_dir)
 
-                    for img in images:
-                        save_image(self.sess, img, request.id, task.id)
+                        for img in images:
+                            save_image(self.sess, img, request.id, task.id)
 
                     task.status = 'success'
                 except Exception as e:
