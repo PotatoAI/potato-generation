@@ -18,6 +18,9 @@ server: .venv config.yaml
 codegen/schema.json: .venv config.yaml
 	$(MAIN) export-graphql-schema
 
+generate: codegen/schema.json
+	$(MAKE) -C codegen generate
+
 install: .venv
 	poetry install
 

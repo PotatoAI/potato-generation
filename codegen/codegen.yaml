@@ -1,4 +1,0 @@
-generates:
-  types.ts:
-    plugins:
-      - typescript
