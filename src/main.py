@@ -51,7 +51,7 @@ parser.add_argument('--config',
 parser.add_argument(
     '--dry-run',
     help='Simulate generation without actually genarting anything',
-    action=argparse.BooleanOptionalAction)
+    action='store_true')
 parser.add_argument('--output-folder',
                     help='Prompt to use for one time generation',
                     nargs='?',
