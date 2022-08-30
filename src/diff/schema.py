@@ -40,6 +40,7 @@ class Image(Base):
     __tablename__ = 'images'
     id = Column(Integer(), primary_key=True)
     filename = Column(String(200), nullable=True)
+    selected = Column(Boolean(), default=False)
     created_on = Column(DateTime(), default=datetime.now)
     updated_on = Column(DateTime(),
                         default=datetime.now,
