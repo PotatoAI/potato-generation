@@ -2,4 +2,4 @@
 output/*.png
 *.db
 config.yaml
-schema.json
+codegen/schema.json
