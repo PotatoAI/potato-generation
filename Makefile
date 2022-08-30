@@ -15,6 +15,9 @@ repl: .venv config.yaml
 server: .venv config.yaml
 	$(MAIN) server
 
+schema.json: .venv config.yaml
+	$(MAIN) export-graphql-schema
+
 install: .venv
 	poetry install
 

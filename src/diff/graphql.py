@@ -1,5 +1,6 @@
 # flask_sqlalchemy/schema.py
 import graphene
+import json
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
@@ -33,3 +34,8 @@ class Query(graphene.ObjectType):
 
 
 schema = graphene.Schema(query=Query)
+
+
+def export():
+    with open('schema.json', 'w') as fp:
+        json.dump(schema.introspect(), fp)

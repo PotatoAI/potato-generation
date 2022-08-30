@@ -2,6 +2,7 @@ import diff.db
 import diff.config
 import diff.schema
 import diff.server
+import diff.graphql
 from diff.login import login
 from diff.worker import Worker
 from diff.storage import add_new_request
@@ -56,6 +57,14 @@ def server(args):
     diff.server.run(sess)
 
 
+def export_graphql_schema(args):
+    info(args)
+    config = diff.config.read(args.config)
+    info(config)
+    sess = diff.db.session(config.db)
+    diff.graphql.export()
+
+
 parser = argparse.ArgumentParser(description='Generate some AI stuff')
 
 parser.add_argument('--config',
@@ -78,6 +87,8 @@ parser_request = subparsers.add_parser('request', help='Run prompt once')
 parser_migrate = subparsers.add_parser('migrate', help='Run migrate')
 parser_repl = subparsers.add_parser('repl', help='Drop into REPL')
 parser_server = subparsers.add_parser('server', help='Run Flask server')
+parser_export_graphql_schema = subparsers.add_parser('export-graphql-schema',
+                                                     help='Run Flask server')
 
 parser_request.add_argument('--prompt',
                             help='Prompt to schedule a task',
@@ -89,6 +100,7 @@ parser_request.set_defaults(func=request)
 parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
 parser_server.set_defaults(func=server)
+parser_export_graphql_schema.set_defaults(func=export_graphql_schema)
 
 args = parser.parse_args()
 args.func(args)
