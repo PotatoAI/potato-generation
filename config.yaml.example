@@ -1,0 +1,5 @@
+hf:
+  token: YOUR_HUGGINGFACE_TOKEN
+db:
+  adapter: sqlite
+  database: main.db

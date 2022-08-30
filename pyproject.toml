@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "diffusion-gen"
+version = "0.1.0"
+description = ""
+authors = ["Max Gonzih <gonzih@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+diffusers = {git = "https://github.com/PotatoAI/diffusers.git", rev = "no-filter"}
+transformers = "^4.21.2"
+scipy = "^1.9.1"
+ftfy = "^6.1.1"
+huggingface-hub = "^0.9.1"
+PyYAML = "^6.0"
+pydantic = "^1.9.2"
+SQLAlchemy = "^1.4.40"
+psycopg2-binary = "^2.9.3"
+ipython = "^8.4.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
