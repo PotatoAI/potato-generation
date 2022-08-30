@@ -1,5 +1,6 @@
 from diff.schema import Request, Task, Image
 from sqlalchemy import desc
+from logging import info
 
 
 def schedule_request(sess, rid: int, priority: int):
@@ -9,7 +10,7 @@ def schedule_request(sess, rid: int, priority: int):
     )
     sess.add(task)
     sess.commit()
-    print(f"Scheduled new task {task.id}")
+    info(f"Scheduled new task {task.id}")
 
 
 def add_new_request(sess, prompt: str, priority=0):
@@ -19,23 +20,24 @@ def add_new_request(sess, prompt: str, priority=0):
     req = Request(
         prompt=prompt,
         priority=priority,
+        approved=True,
     )
     sess.add(req)
     sess.commit()
-    print(f"Created new request {req.id}")
+    info(f"Created new request {req.id}")
     schedule_request(sess, req.id, priority)
 
 
 def query_top_tasks(sess):
-    return sess.query(
-        Task, Request).filter(Task.request_id == Request.id).filter(
-            Task.running == False).filter(Task.status == 'new').order_by(
-                desc(Task.priority)).order_by(Task.created_on)
+    return sess.query(Task, Request).filter(
+        Task.request_id == Request.id, Task.running == False,
+        Task.status == 'new', Request.approved == True).order_by(
+            desc(Task.priority)).order_by(Task.created_on)
 
 
 def has_top_task(sess) -> int:
-    return sess.query(Task).filter(Task.running == False).filter(
-        Task.status == 'new').count()
+    info(query_top_tasks(sess).all())
+    return query_top_tasks(sess).count()
 
 
 def get_top_task(sess) -> Task:
@@ -50,4 +52,4 @@ def save_image(sess, fname: str, rid: int, tid: int):
     )
     sess.add(img)
     sess.commit()
-    print(f"Saved img {img.id} -> {img.filename}")
+    info(f"Saved img {img.id} -> {img.filename}")

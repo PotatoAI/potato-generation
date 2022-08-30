@@ -2,6 +2,7 @@ import time
 from diff.config import GenConfig
 from diff.gen import Generator
 from diff.storage import get_top_task, has_top_task, save_image
+from logging import info
 
 
 class Worker:
@@ -18,14 +19,16 @@ class Worker:
         self.config = gen_config
 
     def run(self):
-        gen = Generator()
+        # gen = Generator()
+        gen = 1
 
         while True:
-            print('Waiting in a loop')
-            time.sleep(1)
-
             avaliable_tasks = has_top_task(self.sess)
-            print(f"{avaliable_tasks} Tasks in queue")
+            info(f"{avaliable_tasks} Tasks in queue")
+
+            if avaliable_tasks == 0:
+                info('Waiting in a loop')
+                time.sleep(10)
 
             if not self.dry_run and avaliable_tasks > 0:
                 task, request = get_top_task(self.sess)
@@ -33,14 +36,18 @@ class Worker:
                 self.sess.commit()
 
                 try:
-                    print(
+                    info(
                         f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                     )
+                    time.sleep(20)
+
                     result = gen.generate(
                         f"request/{request.id}",
                         batch_size=self.config.batch_size,
                         batch_count=self.config.batch_count,
-                        inference_steps=self.config.inference_steps)
+                        inference_steps=self.config.inference_steps,
+                    )
+
                     images = result.save(
                         request_id=request.id,
                         task_id=task.id,
@@ -52,11 +59,12 @@ class Worker:
 
                     task.status = 'success'
                 except Exception as e:
-                    print(e)
-                    task.error = str(e)
                     task.status = 'error'
+                    task.error = str(e)
+                    info(e)
                 finally:
                     task.running = False
-                    self.sess.commit()
             else:
-                print('Dry Run')
+                info('Dry Run')
+
+            self.sess.commit()

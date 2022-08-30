@@ -14,7 +14,7 @@ def db_url(cfg: DBConfig):
 
 
 def connect(cfg: DBConfig):
-    return create_engine(db_url(cfg))
+    return create_engine(db_url(cfg), echo=bool(cfg.echo))
 
 
 def migrate(cfg: DBConfig):

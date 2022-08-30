@@ -10,6 +10,7 @@ class HuggingConfig(BaseModel):
 class DBConfig(BaseModel):
     adapter: str
     database: str
+    echo: Optional[bool]
     user: Optional[str]
     password: Optional[str]
     host: Optional[str]

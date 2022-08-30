@@ -3,6 +3,7 @@ hf:
 db:
   adapter: sqlite
   database: main.db
+  echo: true
 gen:
   inference_steps: 50
   batch_size: 1

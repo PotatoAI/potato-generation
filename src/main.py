@@ -5,6 +5,9 @@ import diff.config
 import diff.schema
 from diff.storage import add_new_request
 import argparse
+import coloredlogs
+
+coloredlogs.install(level='DEBUG')
 
 
 def worker(args):

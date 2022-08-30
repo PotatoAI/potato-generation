@@ -5,6 +5,7 @@ from PIL import Image
 from torch import autocast
 from dataclasses import dataclass
 from typing import List, Any
+from logging import info
 
 
 @dataclass
@@ -34,14 +35,14 @@ class ImagesResult:
 
 class Generator:
     def __init__(self):
-        print('Initializing pipeline')
+        info('Initializing pipeline')
         pipe = StableDiffusionPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
             revision="fp16",
             torch_dtype=torch.float16,
             use_auth_token=True)
         pipe.bypass_nsfw_filter = True
-        print('Moving pipeline to CUDA')
+        info('Moving pipeline to CUDA')
         self.pipe = pipe.to("cuda")
 
     def generate(self,
