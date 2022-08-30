@@ -1,0 +1,16 @@
+version: '3.4'
+services:
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=q2ntW8An1J2mkQQUwGcR
+      - POSTGRES_DB=potatoai
+    ports:
+      - '6970:5432'
+    volumes:
+      - db:/var/lib/postgresql/potatoai-data
+volumes:
+  db:
+    driver: local
