@@ -5,6 +5,7 @@ from PIL import Image
 from torch import autocast
 from dataclasses import dataclass
 from typing import List, Any
+import uuid
 
 
 def image_grid(imgs, rows, cols):
@@ -28,14 +29,14 @@ class ImagesResult:
     def grid(self):
         return image_grid(self.images, self.rows, self.cols)
 
-    def save(self, rid: int, prefix: str, folder: str) -> List[str]:
-        path = f"{folder}/{rid}"
-        os.makedirs(path)
+    def save(self, promt: str, task_id: str, it: str, folder: str) -> List[str]:
+        path = f"{folder}/{promt}"
+        os.makedirs(path, exist_ok=True)
 
         images = []
 
         for i, img in enumerate(self.images):
-            fname = f"{path}/{prefix}-{i}.png"
+            fname = f"{path}/{task_id}-{it}-{uuid.uuid1()}.png"
             img.save(fname)
             images.append(fname)
 
