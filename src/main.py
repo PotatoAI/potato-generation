@@ -1,12 +1,14 @@
-from diff.login import login
 import diff.db
-from diff.worker import Worker
 import diff.config
 import diff.schema
+import diff.server
+from diff.login import login
+from diff.worker import Worker
 from diff.storage import add_new_request
-from logging import info
+
 import argparse
 import coloredlogs
+from logging import info
 
 coloredlogs.install(level='DEBUG')
 
@@ -46,6 +48,14 @@ def repl(args):
     IPython.embed()
 
 
+def server(args):
+    info(args)
+    config = diff.config.read(args.config)
+    info(config)
+    sess = diff.db.session(config.db)
+    diff.server.run(sess)
+
+
 parser = argparse.ArgumentParser(description='Generate some AI stuff')
 
 parser.add_argument('--config',
@@ -67,6 +77,7 @@ parser_worker = subparsers.add_parser('worker', help='Run worker')
 parser_request = subparsers.add_parser('request', help='Run prompt once')
 parser_migrate = subparsers.add_parser('migrate', help='Run migrate')
 parser_repl = subparsers.add_parser('repl', help='Drop into REPL')
+parser_server = subparsers.add_parser('server', help='Run Flask server')
 
 parser_request.add_argument('--prompt',
                             help='Prompt to schedule a task',
@@ -77,6 +88,7 @@ parser_worker.set_defaults(func=worker)
 parser_request.set_defaults(func=request)
 parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
+parser_server.set_defaults(func=server)
 
 args = parser.parse_args()
 args.func(args)

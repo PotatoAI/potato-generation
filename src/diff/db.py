@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from diff.config import DBConfig
 from diff.schema import Base
 
@@ -24,5 +24,13 @@ def migrate(cfg: DBConfig):
 
 def session(cfg: DBConfig):
     engine = connect(cfg)
-    Session = sessionmaker(bind=engine)
-    return Session(bind=engine)
+    session = scoped_session(
+        sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=engine,
+        ))
+
+    Base.query = session.query_property()
+
+    return session

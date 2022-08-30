@@ -12,6 +12,9 @@ migrate: .venv config.yaml
 repl: .venv config.yaml
 	$(MAIN) repl
 
+server: .venv config.yaml
+	$(MAIN) server
+
 install: .venv
 	poetry install
 
