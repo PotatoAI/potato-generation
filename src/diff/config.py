@@ -18,8 +18,7 @@ class DBConfig(BaseModel):
 
 class GenConfig(BaseModel):
     batch_size: int
-    cols: int
-    rows: int
+    batch_count: int
     inference_steps: int
 
 
