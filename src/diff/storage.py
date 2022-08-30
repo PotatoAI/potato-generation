@@ -13,17 +13,17 @@ def schedule_request(sess, rid: int, priority: int):
 
 
 def add_new_request(sess, prompt: str, priority=0):
-    if prompt:
-        req = Request(
-            prompt=prompt,
-            priority=priority,
-        )
-        sess.add(req)
-        sess.commit()
-        print(f"Created new request {req.id}")
-        schedule_request(sess, req.id, priority)
-    else:
-        print('Empty prompt, skipping')
+    if not prompt:
+        prompt = input("Enter prompt: ")
+
+    req = Request(
+        prompt=prompt,
+        priority=priority,
+    )
+    sess.add(req)
+    sess.commit()
+    print(f"Created new request {req.id}")
+    schedule_request(sess, req.id, priority)
 
 
 def query_top_tasks(sess):
