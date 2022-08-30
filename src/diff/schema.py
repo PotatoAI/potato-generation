@@ -24,9 +24,8 @@ class Request(Base):
 class Task(Base):
     __tablename__ = 'tasks'
     id = Column(Integer(), primary_key=True)
-    finished = Column(Boolean(), default=False)
     running = Column(Boolean(), default=False)
-    failed = Column(Boolean(), default=False)
+    status = Column(String(50), nullable=False, default='new')
     error = Column(Text(), nullable=True)
     priority = Column(Integer(), default=0)
     created_on = Column(DateTime(), default=datetime.now)
