@@ -4,6 +4,7 @@ from diff.worker import Worker
 import diff.config
 import diff.schema
 from diff.storage import add_new_request
+from logging import info
 import argparse
 import coloredlogs
 
@@ -11,9 +12,9 @@ coloredlogs.install(level='DEBUG')
 
 
 def worker(args):
-    print(args)
+    info(args)
     config = diff.config.read(args.config)
-    print(config)
+    info(config)
 
     login(config.hf.token)
     sess = diff.db.session(config.db)
@@ -22,24 +23,24 @@ def worker(args):
 
 
 def request(args):
-    print(args)
+    info(args)
     config = diff.config.read(args.config)
-    print(config)
+    info(config)
     sess = diff.db.session(config.db)
     add_new_request(sess, args.prompt, priority=10)
 
 
 def migrate(args):
-    print(args)
+    info(args)
     config = diff.config.read(args.config)
-    print(config)
+    info(config)
     diff.db.migrate(config.db)
 
 
 def repl(args):
-    print(args)
+    info(args)
     config = diff.config.read(args.config)
-    print(config)
+    info(config)
     sess = diff.db.session(config.db)
     import IPython
     IPython.embed()
