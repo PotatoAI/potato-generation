@@ -4,7 +4,6 @@ db:
   adapter: sqlite
   database: main.db
 gen:
-  batch_size: 5
   inference_steps: 50
-  cols: 1
-  rows: 1
+  batch_size: 1
+  batch_count: 1
