@@ -13,7 +13,8 @@ def worker(args):
     print(config)
 
     login(config.hf.token)
-    diff.worker.start(args.dry_run)
+    sess = diff.db.session(config.db)
+    diff.worker.start(sess, args.dry_run)
 
 
 def request(args):
@@ -36,10 +37,8 @@ def repl(args):
     config = diff.config.read(args.config)
     print(config)
     sess = diff.db.session(config.db)
-    task = diff.storage.get_top_task(sess)
-    print(task.id)
-    # import IPython
-    # IPython.embed()
+    import IPython
+    IPython.embed()
 
 
 parser = argparse.ArgumentParser(description='Generate some AI stuff')

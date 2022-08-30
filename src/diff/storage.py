@@ -24,6 +24,6 @@ def add_new_request(sess, prompt: str, priority=0):
 
 
 def get_top_task(sess) -> Task:
-    return sess.query(Task).filter(Task.finished == False).order_by(
-        desc(Task.priority)).order_by(
-            Task.created_on).join(Request).limit(1).one()
+    return sess.query(Task, Request).filter(
+        Task.request_id == Request.id).filter(Task.finished == False).order_by(
+            desc(Task.priority)).order_by(Task.created_on).limit(1).one()

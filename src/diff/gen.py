@@ -34,12 +34,14 @@ class ImagesResult:
 
 class Generator:
     def __init__(self):
+        print('Initializing pipeline')
         pipe = StableDiffusionPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
             revision="fp16",
             torch_dtype=torch.float16,
             use_auth_token=True)
         pipe.bypass_nsfw_filter = True
+        print('Moving pipeline to CUDA')
         self.pipe = pipe.to("cuda")
 
     def generate(self, prompt_str: str, cols=3, rows=1):
