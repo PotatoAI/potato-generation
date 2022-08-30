@@ -34,7 +34,7 @@ class Worker:
 
                 try:
                     print(
-                        f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}. {it + 1}/{self.config.batch_size}"
+                        f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                     )
                     result = gen.generate(
                         f"request/{request.id}",
