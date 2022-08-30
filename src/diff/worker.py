@@ -36,9 +36,11 @@ class Worker:
                     print(
                         f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                     )
-                    result = gen.generate(request.prompt,
-                                          cols=self.config.cols,
-                                          rows=self.config.rows)
+                    result = gen.generate(
+                        request.prompt,
+                        cols=self.config.cols,
+                        rows=self.config.rows,
+                        inference_steps=self.config.inference_steps)
                     images = result.save(request.id, str(task.id),
                                          self.output_dir)
 

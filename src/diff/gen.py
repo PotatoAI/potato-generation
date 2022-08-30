@@ -54,13 +54,14 @@ class Generator:
         print('Moving pipeline to CUDA')
         self.pipe = pipe.to("cuda")
 
-    def generate(self, prompt_str: str, cols=3, rows=1):
+    def generate(self, prompt_str: str, cols=3, rows=1, inference_steps=50):
         prompt = [prompt_str] * cols
         all_images = []
 
         for i in range(rows):
             with autocast("cuda"):
-                images = self.pipe(prompt)["sample"]
+                images = self.pipe(
+                    prompt, num_inference_steps=inference_steps)["sample"]
             all_images.extend(images)
 
         return ImagesResult(all_images, rows, cols)

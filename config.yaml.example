@@ -4,5 +4,6 @@ db:
   adapter: sqlite
   database: main.db
 gen:
+  inference_steps: 50
   cols: 1
   rows: 1

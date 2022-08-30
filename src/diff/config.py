@@ -19,6 +19,7 @@ class DBConfig(BaseModel):
 class GenConfig(BaseModel):
     cols: int
     rows: int
+    inference_steps: int
 
 
 class Config(BaseModel):
