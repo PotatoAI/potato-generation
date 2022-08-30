@@ -1,4 +1,5 @@
 import torch
+import os
 from diffusers import StableDiffusionPipeline
 from PIL import Image
 from torch import autocast
@@ -27,9 +28,18 @@ class ImagesResult:
     def grid(self):
         return image_grid(self.images, self.rows, self.cols)
 
-    def save(self, folder: str):
+    def save(self, rid: int, prefix: str, folder: str) -> List[str]:
+        path = f"{folder}/{rid}"
+        os.makedirs(path)
+
+        images = []
+
         for i, img in enumerate(self.images):
-            img.save(f"{folder}/{i}.png")
+            fname = f"{path}/{prefix}-{i}.png"
+            img.save(fname)
+            images.append(fname)
+
+        return images
 
 
 class Generator:

@@ -16,9 +16,15 @@ class DBConfig(BaseModel):
     port: Optional[int]
 
 
+class GenConfig(BaseModel):
+    cols: int
+    rows: int
+
+
 class Config(BaseModel):
     hf: HuggingConfig
     db: DBConfig
+    gen: GenConfig
 
 
 def read(fname) -> Config:

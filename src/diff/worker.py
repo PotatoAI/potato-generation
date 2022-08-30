@@ -1,12 +1,21 @@
 import time
+from diff.config import GenConfig
 from diff.gen import Generator
-from diff.storage import get_top_task, has_top_task
+from diff.storage import get_top_task, has_top_task, save_image
 
 
-class WorkerThread:
-    def __init__(self, sess, dry_run=False):
+class Worker:
+    def __init__(
+        self,
+        sess,
+        output_dir: str,
+        gen_config: GenConfig,
+        dry_run=False,
+    ):
         self.sess = sess
         self.dry_run = dry_run
+        self.output_dir = output_dir
+        self.config = gen_config
 
     def run(self):
         gen = Generator()
@@ -27,9 +36,15 @@ class WorkerThread:
                     print(
                         f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                     )
-                    imgs = gen.generate(request.prompt, cols=1, rows=1)
-                    print(imgs)
-                    # imgs.save(args.output)
+                    result = gen.generate(request.prompt,
+                                          cols=self.config.cols,
+                                          rows=self.config.rows)
+                    images = result.save(request.id, str(task.id),
+                                         self.output_dir)
+
+                    for img in images:
+                        save_image(self.sess, img, request.id, task.id)
+
                     task.status = 'success'
                 except Exception as e:
                     print(e)
@@ -40,8 +55,3 @@ class WorkerThread:
                     self.sess.commit()
             else:
                 print('Dry Run')
-
-
-def start(sess, dry_run):
-    t = WorkerThread(sess, dry_run)
-    t.run()

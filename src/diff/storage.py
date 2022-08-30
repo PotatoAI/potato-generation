@@ -1,4 +1,4 @@
-from diff.schema import Request, Task
+from diff.schema import Request, Task, Image
 from sqlalchemy import desc
 
 
@@ -40,3 +40,14 @@ def has_top_task(sess) -> int:
 
 def get_top_task(sess) -> Task:
     return query_top_tasks(sess).limit(1).one()
+
+
+def save_image(sess, fname: str, rid: int, tid: int):
+    img = Image(
+        request_id=rid,
+        task_id=tid,
+        filename=fname,
+    )
+    sess.add(img)
+    sess.commit()
+    print(f"Saved img {img.id} -> {img.filename}")

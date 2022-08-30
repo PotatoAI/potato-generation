@@ -3,3 +3,6 @@ hf:
 db:
   adapter: sqlite
   database: main.db
+gen:
+  cols: 1
+  rows: 1

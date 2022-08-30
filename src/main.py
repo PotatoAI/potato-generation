@@ -1,6 +1,6 @@
 from diff.login import login
 import diff.db
-import diff.worker
+from diff.worker import Worker
 import diff.config
 import diff.schema
 from diff.storage import add_new_request
@@ -14,7 +14,8 @@ def worker(args):
 
     login(config.hf.token)
     sess = diff.db.session(config.db)
-    diff.worker.start(sess, args.dry_run)
+    worker = Worker(sess, args.output_folder, config.gen, args.dry_run)
+    worker.run()
 
 
 def request(args):
