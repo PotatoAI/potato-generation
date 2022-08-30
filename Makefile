@@ -16,7 +16,7 @@ install: .venv
 	poetry install
 
 .venv:
-	poetry env use $(shell which python3)
+	poetry env use $(shell which python3.9)
 
 config.yaml:
 	cp config.yaml.example $@
