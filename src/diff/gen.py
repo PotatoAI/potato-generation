@@ -1,5 +1,6 @@
 import torch
 import os
+import uuid
 from diffusers import StableDiffusionPipeline
 from PIL import Image
 from torch import autocast
@@ -26,7 +27,8 @@ class ImagesResult:
         images = []
 
         for i, img in enumerate(self.images):
-            fname = f"{path}/{task_id}-{i}.png"
+            id = uuid.uuid1()
+            fname = f"{path}/{task_id}-{i}-{id}.png"
             img.save(fname)
             images.append(fname)
 
