@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from diff.config import DBConfig
 from diff.schema import Base
 
-db_session = False
 
 def db_url(cfg: DBConfig):
     if cfg.adapter == "psql":
@@ -23,7 +22,7 @@ def migrate(cfg: DBConfig):
     Base.metadata.create_all(engine)
 
 
-def session(cfg: DBConfig):
+def init_session(cfg: DBConfig) -> scoped_session:
     engine = connect(cfg)
     session = scoped_session(
         sessionmaker(
@@ -33,7 +32,5 @@ def session(cfg: DBConfig):
         ))
 
     Base.query = session.query_property()
-    global db_session
-    db_session = session
 
     return session

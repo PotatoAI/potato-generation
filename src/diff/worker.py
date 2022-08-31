@@ -2,20 +2,18 @@ import time
 import socket
 from diff.config import GenConfig
 from diff.gen import Generator
-from diff.storage import get_top_task, has_top_task, save_image
-from logging import info
+from diff.storage import get_top_task, has_top_task, save_image, commit
+from logging import info, error
 
 
 class Worker:
     def __init__(
         self,
-        sess,
         output_dir: str,
         gen_config: GenConfig,
         dry_run=False,
     ):
         self.task_kind = "diffusion"
-        self.sess = sess
         self.dry_run = dry_run
         self.output_dir = output_dir
         self.config = gen_config
@@ -24,7 +22,7 @@ class Worker:
         gen = Generator()
 
         while True:
-            avaliable_tasks = has_top_task(self.sess, self.task_kind)
+            avaliable_tasks = has_top_task(self.task_kind)
             info(f"{avaliable_tasks} Tasks in queue")
 
             if avaliable_tasks == 0:
@@ -32,10 +30,10 @@ class Worker:
                 time.sleep(10)
 
             if not self.dry_run and avaliable_tasks > 0:
-                task, request = get_top_task(self.sess, self.task_kind)
+                task, request = get_top_task(self.task_kind)
                 task.worker_id = socket.gethostname()
                 task.running = True
-                self.sess.commit()
+                commit()
 
                 try:
                     info(
@@ -57,17 +55,17 @@ class Worker:
                     )
 
                     for img in images:
-                        save_image(self.sess, img, request.id, task.id)
+                        save_image(img, request.id, task.id)
 
                     task.status = 'success'
                     request.generated = True
                 except Exception as e:
                     task.status = 'error'
                     task.error = str(e)
-                    info(e)
+                    error(e)
                 finally:
                     task.running = False
             else:
                 info('Dry Run')
 
-            self.sess.commit()
+            commit()

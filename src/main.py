@@ -1,11 +1,11 @@
 import diff.db
 import diff.config
 import diff.schema
-import diff.server
 import diff.graphql
 from diff.login import login
 from diff.worker import Worker
 from diff.storage import add_new_request
+from diff.config import Config
 
 import argparse
 import coloredlogs
@@ -13,56 +13,35 @@ from logging import info
 
 coloredlogs.install(level='DEBUG')
 
+config: Config
+
 
 def worker(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
-
-    login(config.hf.token)
-    sess = diff.db.session(config.db)
-    worker = Worker(sess, args.output_folder, config.gen, args.dry_run)
+    worker = Worker(args.output_folder, config.gen, args.dry_run)
     worker.run()
 
 
 def request(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
-    sess = diff.db.session(config.db)
-    add_new_request(sess, args.prompt, priority=10)
+    add_new_request(args.prompt, priority=10)
 
 
 def migrate(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
     diff.db.migrate(config.db)
 
 
 def repl(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
-    sess = diff.db.session(config.db)
     import IPython
     IPython.embed()
 
 
 def server(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
-    sess = diff.db.session(config.db)
-    diff.server.run(sess)
+    import diff.server
+    diff.server.run()
 
 
 def export_graphql_schema(args):
-    info(args)
-    config = diff.config.read(args.config)
-    info(config)
-    sess = diff.db.session(config.db)
-    diff.graphql.export()
+    print('disabled for now')
+    # diff.graphql.export()
 
 
 parser = argparse.ArgumentParser(description='Generate some AI stuff')
@@ -103,4 +82,10 @@ parser_server.set_defaults(func=server)
 parser_export_graphql_schema.set_defaults(func=export_graphql_schema)
 
 args = parser.parse_args()
+
+info(args)
+config = diff.config.read(args.config)
+info(config)
+diff.storage.init_db_session(config.db)
+
 args.func(args)
