@@ -21,6 +21,9 @@ ui/graphql/schema.json: config.yaml
 generate: ui/graphql/schema.json
 	$(MAKE) -C ui generate
 
+ui-start:
+	cd ui && npm run start
+
 install: .venv
 	poetry install
 
