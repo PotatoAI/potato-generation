@@ -3,6 +3,7 @@ import {
   useAllRequestsQuery,
   useAllTasksQuery,
   useAllImagesQuery,
+  useChangeNotificationSubscription,
   RequestSortEnum,
   TaskSortEnum,
   ImageSortEnum,
@@ -224,6 +225,9 @@ const App = () => {
   const allTabs = ["requests", "tasks", "images"];
   const [currentTabI, setCurrentTabI] = useState(0);
   const currentTab = allTabs[currentTabI];
+
+  // const [res] = useChangeNotificationSubscription();
+  // console.log(res);
 
   let dataGrid = <RequestsDataGrid />;
 

@@ -76,3 +76,7 @@ query AllImages($sort: [ImageSortEnum]) {
     }
   }
 }
+
+subscription ChangeNotification {
+  changeNotification
+}

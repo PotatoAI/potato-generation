@@ -190,6 +190,11 @@ export enum RequestSortEnum {
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  changeNotification?: Maybe<Scalars['String']>;
+};
+
 export type Task = Node & {
   __typename?: 'Task';
   createdOn?: Maybe<Scalars['DateTime']>;
@@ -275,6 +280,11 @@ export type AllImagesQueryVariables = Exact<{
 
 
 export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null } | null } | null> } | null };
+
+export type ChangeNotificationSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ChangeNotificationSubscription = { __typename?: 'Subscription', changeNotification?: string | null };
 
 
 export const AllRequestsDocument = gql`
@@ -369,4 +379,13 @@ export const AllImagesDocument = gql`
 
 export function useAllImagesQuery(options?: Omit<Urql.UseQueryArgs<AllImagesQueryVariables>, 'query'>) {
   return Urql.useQuery<AllImagesQuery, AllImagesQueryVariables>({ query: AllImagesDocument, ...options });
+};
+export const ChangeNotificationDocument = gql`
+    subscription ChangeNotification {
+  changeNotification
+}
+    `;
+
+export function useChangeNotificationSubscription<TData = ChangeNotificationSubscription>(options: Omit<Urql.UseSubscriptionArgs<ChangeNotificationSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<ChangeNotificationSubscription, TData>) {
+  return Urql.useSubscription<ChangeNotificationSubscription, TData, ChangeNotificationSubscriptionVariables>({ query: ChangeNotificationDocument, ...options }, handler);
 };

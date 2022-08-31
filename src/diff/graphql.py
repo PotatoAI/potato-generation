@@ -1,6 +1,8 @@
 # flask_sqlalchemy/schema.py
 import graphene
 import json
+import asyncio
+from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
@@ -31,7 +33,17 @@ class Query(graphene.ObjectType):
     all_images = SQLAlchemyConnectionField(Image.connection)
 
 
-schema = graphene.Schema(query=Query)
+class Subscription(graphene.ObjectType):
+    change_notification = graphene.String()
+
+    async def subscribe_change_notification(self, info):
+        while True:
+            d = datetime.now().isoformat()
+            yield f"requests-{d}"
+            await asyncio.sleep(1)
+
+
+schema = graphene.Schema(query=Query, subscription=Subscription)
 
 
 def export():
