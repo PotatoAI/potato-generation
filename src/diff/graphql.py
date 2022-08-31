@@ -2,10 +2,12 @@
 import graphene
 import json
 import asyncio
+import diff.db
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
+from .storage import add_new_request
 
 
 class Request(SQLAlchemyObjectType):
@@ -40,8 +42,8 @@ class CreateRequest(graphene.Mutation):
     ok = graphene.Boolean()
     request = graphene.Field(lambda: Request)
 
-    def mutate(root, info, name):
-        request = Request(name=name)
+    def mutate(root, info, prompt):
+        request = add_new_request(diff.db.db_sesson, prompt)
         ok = True
         return CreateRequest(request=request, ok=ok)
 

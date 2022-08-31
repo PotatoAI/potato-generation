@@ -28,6 +28,7 @@ def add_new_request(sess, prompt: str, kind: str = "diffusion", priority=0):
     sess.commit()
     info(f"Created new request {req.id}")
     schedule_request(sess, req.id, priority, kind=kind)
+    return req
 
 
 def query_top_tasks(sess, kind: str):

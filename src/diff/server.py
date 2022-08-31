@@ -6,6 +6,7 @@ from .graphql import schema
 app = Flask(__name__)
 CORS(app)
 app.debug = True
+db_session = None
 
 app.add_url_rule(
     '/graphql',
@@ -18,4 +19,6 @@ app.add_url_rule(
 
 
 def run(sess):
+    global db_session
+    db_session = sess
     app.run()
