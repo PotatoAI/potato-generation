@@ -80,6 +80,9 @@ const AppTabs = (props: {
   );
 };
 
+const dateColW = 150;
+const gridSX = { height: "calc(100vh - 70px)", width: "100%" };
+
 const RequestsDataGrid = () => {
   const [result] = useAllRequestsQuery({
     variables: { sort: RequestSortEnum.CreatedOnDesc },
@@ -95,8 +98,8 @@ const RequestsDataGrid = () => {
     },
     { field: "approved", width: 90 },
     { field: "generated", width: 90 },
-    { field: "createdOn", width: 90 },
-    { field: "updatedOn", width: 90 },
+    { field: "createdOn", width: dateColW },
+    { field: "updatedOn", width: dateColW },
     {
       field: "tasks",
       valueGetter: (params) => params.row.tasks["edges"].length,
@@ -110,7 +113,7 @@ const RequestsDataGrid = () => {
   const rows = data?.allRequests?.edges?.map((edge) => edge?.node) ?? [];
 
   const dataGrid = (
-    <Box sx={{ height: 400, width: "100%" }}>
+    <Box sx={gridSX}>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -146,15 +149,15 @@ const TasksDataGrid = () => {
       width: 250,
     },
     { field: "priority" },
-    { field: "createdOn" },
-    { field: "updatedOn" },
+    { field: "createdOn", width: dateColW },
+    { field: "updatedOn", width: dateColW },
     { field: "requestId" },
   ];
 
   const rows = data?.allTasks?.edges?.map((edge) => edge?.node) ?? [];
 
   const dataGrid = (
-    <Box sx={{ height: 400, width: "100%" }}>
+    <Box sx={gridSX}>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -185,8 +188,8 @@ const ImagesDataGrid = () => {
     { field: "id", headerName: "ID", width: 90 },
     { field: "filename" },
     { field: "selected" },
-    { field: "createdOn" },
-    { field: "updatedOn" },
+    { field: "createdOn", width: dateColW },
+    { field: "updatedOn", width: dateColW },
     { field: "requestId" },
     { field: "taskId" },
   ];
@@ -194,7 +197,7 @@ const ImagesDataGrid = () => {
   const rows = data?.allImages?.edges?.map((edge) => edge?.node) ?? [];
 
   const dataGrid = (
-    <Box sx={{ height: 400, width: "100%" }}>
+    <Box sx={gridSX}>
       <DataGrid
         rows={rows}
         columns={columns}
