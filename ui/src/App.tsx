@@ -91,8 +91,19 @@ const RequestsDataGrid = () => {
     { field: "id", headerName: "ID", width: 90 },
     {
       field: "prompt",
-      headerName: "Prompt",
-      width: 150,
+      width: 250,
+    },
+    { field: "approved", width: 90 },
+    { field: "generated", width: 90 },
+    { field: "createdOn", width: 90 },
+    { field: "updatedOn", width: 90 },
+    {
+      field: "tasks",
+      valueGetter: (params) => params.row.tasks["edges"].length,
+    },
+    {
+      field: "images",
+      valueGetter: (params) => params.row.images["edges"].length,
     },
   ];
 
@@ -128,16 +139,16 @@ const TasksDataGrid = () => {
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 90 },
-    {
-      field: "running",
-      headerName: "Running",
-      width: 150,
-    },
+    { field: "running" },
+    { field: "status" },
     {
       field: "error",
-      headerName: "Error",
-      width: 150,
+      width: 250,
     },
+    { field: "priority" },
+    { field: "createdOn" },
+    { field: "updatedOn" },
+    { field: "requestId" },
   ];
 
   const rows = data?.allTasks?.edges?.map((edge) => edge?.node) ?? [];
@@ -172,16 +183,12 @@ const ImagesDataGrid = () => {
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 90 },
-    {
-      field: "running",
-      headerName: "Running",
-      width: 150,
-    },
-    {
-      field: "error",
-      headerName: "Error",
-      width: 150,
-    },
+    { field: "filename" },
+    { field: "selected" },
+    { field: "createdOn" },
+    { field: "updatedOn" },
+    { field: "requestId" },
+    { field: "taskId" },
   ];
 
   const rows = data?.allImages?.edges?.map((edge) => edge?.node) ?? [];
