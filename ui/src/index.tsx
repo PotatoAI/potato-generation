@@ -4,9 +4,17 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createClient, Provider } from "urql";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 const client = createClient({
   url: "http://localhost:5000/graphql",
+});
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
 });
 
 const root = ReactDOM.createRoot(
@@ -14,9 +22,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <Provider value={client}>
-      <App />
-    </Provider>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Provider value={client}>
+        <App />
+      </Provider>
+    </ThemeProvider>
   </React.StrictMode>
 );
 

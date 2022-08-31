@@ -1,9 +1,32 @@
-query AllRequests {
-  allRequests {
+query AllRequests($sort: [RequestSortEnum]) {
+  allRequests(sort: $sort) {
     edges {
       node {
         id,
         prompt,
+        priority,
+        approved,
+        generated,
+        createdOn,
+        updatedOn,
+        tasks {
+          edges {
+            node {
+              id,
+              status,
+              running,
+              error,
+            }
+          }
+        },
+        images {
+          edges {
+            node {
+              id,
+              filename,
+            }
+          }
+        },
       }
     }
   }

@@ -246,19 +246,44 @@ export enum TaskSortEnum {
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
 
-export type AllRequestsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AllRequestsQueryVariables = Exact<{
+  sort?: InputMaybe<Array<InputMaybe<RequestSortEnum>> | InputMaybe<RequestSortEnum>>;
+}>;
 
 
-export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string } | null } | null> } | null };
+export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
 
 
 export const AllRequestsDocument = gql`
-    query AllRequests {
-  allRequests {
+    query AllRequests($sort: [RequestSortEnum]) {
+  allRequests(sort: $sort) {
     edges {
       node {
         id
         prompt
+        priority
+        approved
+        generated
+        createdOn
+        updatedOn
+        tasks {
+          edges {
+            node {
+              id
+              status
+              running
+              error
+            }
+          }
+        }
+        images {
+          edges {
+            node {
+              id
+              filename
+            }
+          }
+        }
       }
     }
   }
