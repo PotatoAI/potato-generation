@@ -199,6 +199,7 @@ export type Task = Node & {
   running?: Maybe<Scalars['Boolean']>;
   status: Scalars['String'];
   updatedOn?: Maybe<Scalars['DateTime']>;
+  workerId: Scalars['String'];
 };
 
 
@@ -243,7 +244,9 @@ export enum TaskSortEnum {
   StatusAsc = 'STATUS_ASC',
   StatusDesc = 'STATUS_DESC',
   UpdatedOnAsc = 'UPDATED_ON_ASC',
-  UpdatedOnDesc = 'UPDATED_ON_DESC'
+  UpdatedOnDesc = 'UPDATED_ON_DESC',
+  WorkerIdAsc = 'WORKER_ID_ASC',
+  WorkerIdDesc = 'WORKER_ID_DESC'
 }
 
 export type AllRequestsQueryVariables = Exact<{
@@ -258,7 +261,7 @@ export type AllTasksQueryVariables = Exact<{
 }>;
 
 
-export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllImagesQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
@@ -317,6 +320,7 @@ export const AllTasksDocument = gql`
         status
         error
         priority
+        workerId
         createdOn
         updatedOn
         requestId

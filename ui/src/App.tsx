@@ -149,6 +149,7 @@ const TasksDataGrid = () => {
       width: 250,
     },
     { field: "priority" },
+    { field: "workerId" },
     { field: "createdOn", width: dateColW },
     { field: "updatedOn", width: dateColW },
     { field: "requestId" },

@@ -41,6 +41,7 @@ query AllTasks($sort: [TaskSortEnum]) {
         status,
         error,
         priority,
+        workerId,
         createdOn,
         updatedOn,
         requestId,

@@ -17,8 +17,8 @@ class Request(Base):
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
-    tasks = relationship("Task")
-    images = relationship("Image")
+    tasks = relationship("Task", cascade="all, delete-orphan")
+    images = relationship("Image", cascade="all, delete-orphan")
 
 
 class Task(Base):
@@ -28,12 +28,13 @@ class Task(Base):
     status = Column(String(50), nullable=False, default='new')
     error = Column(Text(), nullable=True)
     priority = Column(Integer(), default=0)
+    worker_id = Column(String(100), nullable=False, default='unknown')
     created_on = Column(DateTime(), default=datetime.now)
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
     request_id = Column(Integer, ForeignKey('requests.id'))
-    images = relationship("Image")
+    images = relationship("Image", cascade="all, delete-orphan")
 
 
 class Image(Base):
