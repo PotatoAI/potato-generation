@@ -27,6 +27,7 @@ ui-start:
 
 install: .venv
 	poetry install
+	$(MAKE) -c ui npm-i
 
 .venv:
 	poetry env use $(shell which python3.9)
