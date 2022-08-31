@@ -77,6 +77,17 @@ query AllImages($sort: [ImageSortEnum]) {
   }
 }
 
-subscription ChangeNotification {
-  changeNotification
+mutation CreateRequest($prompt: String) {
+  createRequest(prompt: $prompt) {
+    ok,
+    request {
+      id
+    }
+  }
+}
+
+mutation ApproveRequest($id: String) {
+  approveRequest(id: $id) {
+    ok
+  }
 }

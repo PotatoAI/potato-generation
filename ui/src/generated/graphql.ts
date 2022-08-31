@@ -16,6 +16,17 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type ApproveRequest = {
+  __typename?: 'ApproveRequest';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type CreateRequest = {
+  __typename?: 'CreateRequest';
+  ok?: Maybe<Scalars['Boolean']>;
+  request?: Maybe<Request>;
+};
+
 export type Image = Node & {
   __typename?: 'Image';
   createdOn?: Maybe<Scalars['DateTime']>;
@@ -62,6 +73,22 @@ export enum ImageSortEnum {
   UpdatedOnAsc = 'UPDATED_ON_ASC',
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  approveRequest?: Maybe<ApproveRequest>;
+  createRequest?: Maybe<CreateRequest>;
+};
+
+
+export type MutationApproveRequestArgs = {
+  id?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationCreateRequestArgs = {
+  prompt?: InputMaybe<Scalars['String']>;
+};
 
 /** An object with an ID */
 export type Node = {
@@ -190,11 +217,6 @@ export enum RequestSortEnum {
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
 
-export type Subscription = {
-  __typename?: 'Subscription';
-  changeNotification?: Maybe<Scalars['String']>;
-};
-
 export type Task = Node & {
   __typename?: 'Task';
   createdOn?: Maybe<Scalars['DateTime']>;
@@ -281,10 +303,19 @@ export type AllImagesQueryVariables = Exact<{
 
 export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null } | null } | null> } | null };
 
-export type ChangeNotificationSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type CreateRequestMutationVariables = Exact<{
+  prompt?: InputMaybe<Scalars['String']>;
+}>;
 
 
-export type ChangeNotificationSubscription = { __typename?: 'Subscription', changeNotification?: string | null };
+export type CreateRequestMutation = { __typename?: 'Mutation', createRequest?: { __typename?: 'CreateRequest', ok?: boolean | null, request?: { __typename?: 'Request', id: string } | null } | null };
+
+export type ApproveRequestMutationVariables = Exact<{
+  id?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type ApproveRequestMutation = { __typename?: 'Mutation', approveRequest?: { __typename?: 'ApproveRequest', ok?: boolean | null } | null };
 
 
 export const AllRequestsDocument = gql`
@@ -380,12 +411,28 @@ export const AllImagesDocument = gql`
 export function useAllImagesQuery(options?: Omit<Urql.UseQueryArgs<AllImagesQueryVariables>, 'query'>) {
   return Urql.useQuery<AllImagesQuery, AllImagesQueryVariables>({ query: AllImagesDocument, ...options });
 };
-export const ChangeNotificationDocument = gql`
-    subscription ChangeNotification {
-  changeNotification
+export const CreateRequestDocument = gql`
+    mutation CreateRequest($prompt: String) {
+  createRequest(prompt: $prompt) {
+    ok
+    request {
+      id
+    }
+  }
 }
     `;
 
-export function useChangeNotificationSubscription<TData = ChangeNotificationSubscription>(options: Omit<Urql.UseSubscriptionArgs<ChangeNotificationSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<ChangeNotificationSubscription, TData>) {
-  return Urql.useSubscription<ChangeNotificationSubscription, TData, ChangeNotificationSubscriptionVariables>({ query: ChangeNotificationDocument, ...options }, handler);
+export function useCreateRequestMutation() {
+  return Urql.useMutation<CreateRequestMutation, CreateRequestMutationVariables>(CreateRequestDocument);
+};
+export const ApproveRequestDocument = gql`
+    mutation ApproveRequest($id: String) {
+  approveRequest(id: $id) {
+    ok
+  }
+}
+    `;
+
+export function useApproveRequestMutation() {
+  return Urql.useMutation<ApproveRequestMutation, ApproveRequestMutationVariables>(ApproveRequestDocument);
 };
