@@ -33,6 +33,21 @@ class Query(graphene.ObjectType):
     all_images = SQLAlchemyConnectionField(Image.connection)
 
 
+class CreateRequest(graphene.Mutation):
+    class Arguments:
+        prompt = graphene.String()
+
+    ok = graphene.Boolean()
+    request = graphene.Field(lambda: Request)
+
+    def mutate(root, info, name):
+        request = Request(name=name)
+        ok = True
+        return CreateRequest(request=request, ok=ok)
+
+class Mutation(graphene.ObjectType):
+    request = CreateRequest.Field()
+
 class Subscription(graphene.ObjectType):
     change_notification = graphene.String()
 
@@ -43,7 +58,7 @@ class Subscription(graphene.ObjectType):
             await asyncio.sleep(1)
 
 
-schema = graphene.Schema(query=Query, subscription=Subscription)
+schema = graphene.Schema(query=Query, subscription=Subscription, mutation=Mutation,)
 
 
 def export():
