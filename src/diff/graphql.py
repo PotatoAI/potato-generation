@@ -37,5 +37,5 @@ schema = graphene.Schema(query=Query)
 
 
 def export():
-    with open('codegen/schema.json', 'w') as fp:
+    with open('ui/graphql/schema.json', 'w') as fp:
         json.dump(schema.introspect(), fp)

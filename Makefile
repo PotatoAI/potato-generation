@@ -1,25 +1,25 @@
 MAIN = poetry run python src/main.py
 
-request: .venv config.yaml
+request: config.yaml
 	$(MAIN) request --prompt "$(PROMPT)"
 
-worker: .venv config.yaml
+worker: config.yaml
 	$(MAIN) worker
 
-migrate: .venv config.yaml
+migrate: config.yaml
 	$(MAIN) migrate
 
-repl: .venv config.yaml
+repl: config.yaml
 	$(MAIN) repl
 
 server: .venv config.yaml
 	$(MAIN) server
 
-codegen/schema.json: .venv config.yaml
+ui/graphql/schema.json: config.yaml
 	$(MAIN) export-graphql-schema
 
-generate: codegen/schema.json
-	$(MAKE) -C codegen generate
+generate: ui/graphql/schema.json
+	$(MAKE) -C ui generate
 
 install: .venv
 	poetry install
