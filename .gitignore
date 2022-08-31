@@ -3,3 +3,4 @@ output/*.png
 *.db
 config.yaml
 codegen/schema.json
+.log
