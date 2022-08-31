@@ -13,6 +13,7 @@ class Request(Base):
     priority = Column(Integer(), default=0)
     approved = Column(Boolean(), default=False)
     generated = Column(Boolean(), default=False)
+    kind = Column(String(100), nullable=False, default='unknown')
     created_on = Column(DateTime(), default=datetime.now)
     updated_on = Column(DateTime(),
                         default=datetime.now,
@@ -29,6 +30,7 @@ class Task(Base):
     error = Column(Text(), nullable=True)
     priority = Column(Integer(), default=0)
     worker_id = Column(String(100), nullable=False, default='unknown')
+    kind = Column(String(100), nullable=False, default='unknown')
     created_on = Column(DateTime(), default=datetime.now)
     updated_on = Column(DateTime(),
                         default=datetime.now,

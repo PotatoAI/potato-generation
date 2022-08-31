@@ -7,6 +7,7 @@ query AllRequests($sort: [RequestSortEnum]) {
         priority,
         approved,
         generated,
+        kind,
         createdOn,
         updatedOn,
         tasks {
@@ -42,6 +43,7 @@ query AllTasks($sort: [TaskSortEnum]) {
         error,
         priority,
         workerId,
+        kind,
         createdOn,
         updatedOn,
         requestId,

@@ -98,6 +98,7 @@ const RequestsDataGrid = () => {
     },
     { field: "approved", width: 90 },
     { field: "generated", width: 90 },
+    { field: "kind" },
     { field: "createdOn", width: dateColW },
     { field: "updatedOn", width: dateColW },
     {
@@ -150,6 +151,7 @@ const TasksDataGrid = () => {
     },
     { field: "priority" },
     { field: "workerId" },
+    { field: "kind" },
     { field: "createdOn", width: dateColW },
     { field: "updatedOn", width: dateColW },
     { field: "requestId" },

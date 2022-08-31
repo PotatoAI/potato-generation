@@ -130,6 +130,7 @@ export type Request = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   images?: Maybe<ImageConnection>;
+  kind: Scalars['String'];
   priority?: Maybe<Scalars['Int']>;
   prompt: Scalars['String'];
   tasks?: Maybe<TaskConnection>;
@@ -179,6 +180,8 @@ export enum RequestSortEnum {
   GeneratedDesc = 'GENERATED_DESC',
   IdAsc = 'ID_ASC',
   IdDesc = 'ID_DESC',
+  KindAsc = 'KIND_ASC',
+  KindDesc = 'KIND_DESC',
   PriorityAsc = 'PRIORITY_ASC',
   PriorityDesc = 'PRIORITY_DESC',
   PromptAsc = 'PROMPT_ASC',
@@ -194,6 +197,7 @@ export type Task = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   images?: Maybe<ImageConnection>;
+  kind: Scalars['String'];
   priority?: Maybe<Scalars['Int']>;
   requestId?: Maybe<Scalars['Int']>;
   running?: Maybe<Scalars['Boolean']>;
@@ -235,6 +239,8 @@ export enum TaskSortEnum {
   ErrorDesc = 'ERROR_DESC',
   IdAsc = 'ID_ASC',
   IdDesc = 'ID_DESC',
+  KindAsc = 'KIND_ASC',
+  KindDesc = 'KIND_DESC',
   PriorityAsc = 'PRIORITY_ASC',
   PriorityDesc = 'PRIORITY_DESC',
   RequestIdAsc = 'REQUEST_ID_ASC',
@@ -254,14 +260,14 @@ export type AllRequestsQueryVariables = Exact<{
 }>;
 
 
-export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, kind: string, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllTasksQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<TaskSortEnum>> | InputMaybe<TaskSortEnum>>;
 }>;
 
 
-export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, kind: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllImagesQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
@@ -281,6 +287,7 @@ export const AllRequestsDocument = gql`
         priority
         approved
         generated
+        kind
         createdOn
         updatedOn
         tasks {
@@ -321,6 +328,7 @@ export const AllTasksDocument = gql`
         error
         priority
         workerId
+        kind
         createdOn
         updatedOn
         requestId
