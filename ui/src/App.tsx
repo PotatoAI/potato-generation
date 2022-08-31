@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { useAllRequestsQuery, RequestSortEnum } from "./generated/graphql";
+import {
+  useAllRequestsQuery,
+  useAllTasksQuery,
+  useAllImagesQuery,
+  RequestSortEnum,
+  TaskSortEnum,
+  ImageSortEnum,
+} from "./generated/graphql";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { ChaoticOrbit } from "@uiball/loaders";
 
@@ -89,9 +96,95 @@ const RequestsDataGrid = () => {
     },
   ];
 
-  console.log(data);
-  console.log(error);
   const rows = data?.allRequests?.edges?.map((edge) => edge?.node) ?? [];
+
+  const dataGrid = (
+    <Box sx={{ height: 400, width: "100%" }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+        disableSelectionOnClick
+      />
+    </Box>
+  );
+
+  return (
+    <>
+      <p>{error ? JSON.stringify(error) : ""}</p>
+      {fetching ? loader : dataGrid}
+    </>
+  );
+};
+
+const TasksDataGrid = () => {
+  const [result] = useAllTasksQuery({
+    variables: { sort: TaskSortEnum.CreatedOnDesc },
+  });
+
+  const { data, fetching, error } = result;
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "running",
+      headerName: "Running",
+      width: 150,
+    },
+    {
+      field: "error",
+      headerName: "Error",
+      width: 150,
+    },
+  ];
+
+  const rows = data?.allTasks?.edges?.map((edge) => edge?.node) ?? [];
+
+  const dataGrid = (
+    <Box sx={{ height: 400, width: "100%" }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+        disableSelectionOnClick
+      />
+    </Box>
+  );
+
+  return (
+    <>
+      <p>{error ? JSON.stringify(error) : ""}</p>
+      {fetching ? loader : dataGrid}
+    </>
+  );
+};
+
+const ImagesDataGrid = () => {
+  const [result] = useAllImagesQuery({
+    variables: { sort: ImageSortEnum.CreatedOnDesc },
+  });
+
+  const { data, fetching, error } = result;
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "running",
+      headerName: "Running",
+      width: 150,
+    },
+    {
+      field: "error",
+      headerName: "Error",
+      width: 150,
+    },
+  ];
+
+  const rows = data?.allImages?.edges?.map((edge) => edge?.node) ?? [];
 
   const dataGrid = (
     <Box sx={{ height: 400, width: "100%" }}>
@@ -119,7 +212,15 @@ const App = () => {
   const [currentTabI, setCurrentTabI] = useState(0);
   const currentTab = allTabs[currentTabI];
 
-  const dataGrid = <RequestsDataGrid />;
+  let dataGrid = <RequestsDataGrid />;
+
+  if (currentTab === "tasks") {
+    dataGrid = <TasksDataGrid />;
+  }
+
+  if (currentTab === "images") {
+    dataGrid = <ImagesDataGrid />;
+  }
 
   return (
     <Box>
