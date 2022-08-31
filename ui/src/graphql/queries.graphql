@@ -31,3 +31,45 @@ query AllRequests($sort: [RequestSortEnum]) {
     }
   }
 }
+
+query AllTasks($sort: [TaskSortEnum]) {
+  allTasks(sort: $sort) {
+    edges {
+      node {
+        id,
+        running,
+        status,
+        error,
+        priority,
+        createdOn,
+        updatedOn,
+        requestId,
+        images {
+          edges {
+            node {
+              id,
+              filename,
+            }
+          }
+        },
+      }
+    }
+  }
+}
+
+
+query AllImages($sort: [ImageSortEnum]) {
+  allImages(sort: $sort) {
+    edges {
+      node {
+        id,
+        filename,
+        selected,
+        createdOn,
+        updatedOn,
+        requestId,
+        taskId,
+      }
+    }
+  }
+}

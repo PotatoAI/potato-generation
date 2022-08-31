@@ -253,6 +253,20 @@ export type AllRequestsQueryVariables = Exact<{
 
 export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
 
+export type AllTasksQueryVariables = Exact<{
+  sort?: InputMaybe<Array<InputMaybe<TaskSortEnum>> | InputMaybe<TaskSortEnum>>;
+}>;
+
+
+export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+
+export type AllImagesQueryVariables = Exact<{
+  sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
+}>;
+
+
+export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null } | null } | null> } | null };
+
 
 export const AllRequestsDocument = gql`
     query AllRequests($sort: [RequestSortEnum]) {
@@ -292,4 +306,55 @@ export const AllRequestsDocument = gql`
 
 export function useAllRequestsQuery(options?: Omit<Urql.UseQueryArgs<AllRequestsQueryVariables>, 'query'>) {
   return Urql.useQuery<AllRequestsQuery, AllRequestsQueryVariables>({ query: AllRequestsDocument, ...options });
+};
+export const AllTasksDocument = gql`
+    query AllTasks($sort: [TaskSortEnum]) {
+  allTasks(sort: $sort) {
+    edges {
+      node {
+        id
+        running
+        status
+        error
+        priority
+        createdOn
+        updatedOn
+        requestId
+        images {
+          edges {
+            node {
+              id
+              filename
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+export function useAllTasksQuery(options?: Omit<Urql.UseQueryArgs<AllTasksQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllTasksQuery, AllTasksQueryVariables>({ query: AllTasksDocument, ...options });
+};
+export const AllImagesDocument = gql`
+    query AllImages($sort: [ImageSortEnum]) {
+  allImages(sort: $sort) {
+    edges {
+      node {
+        id
+        filename
+        selected
+        createdOn
+        updatedOn
+        requestId
+        taskId
+      }
+    }
+  }
+}
+    `;
+
+export function useAllImagesQuery(options?: Omit<Urql.UseQueryArgs<AllImagesQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllImagesQuery, AllImagesQueryVariables>({ query: AllImagesDocument, ...options });
 };
