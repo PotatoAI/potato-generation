@@ -16,7 +16,7 @@ server: .venv config.yaml
 	$(MAIN) server
 
 ui/src/graphql/schema.schema: config.yaml
-	# $(MAIN) export-graphql-schema
+	echo $(MAIN) export-graphql-schema
 	echo 'disable generation from python, using link directly'
 
 generate: ui/src/graphql/schema.schema
