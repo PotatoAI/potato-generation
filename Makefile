@@ -15,10 +15,11 @@ repl: config.yaml
 server: .venv config.yaml
 	$(MAIN) server
 
-ui/graphql/schema.json: config.yaml
-	$(MAIN) export-graphql-schema
+ui/src/graphql/schema.schema: config.yaml
+	# $(MAIN) export-graphql-schema
+	echo 'disable generation from python, using link directly'
 
-generate: ui/graphql/schema.json
+generate: ui/src/graphql/schema.schema
 	$(MAKE) -C ui generate
 
 ui-start:
@@ -32,3 +33,7 @@ install: .venv
 
 config.yaml:
 	cp config.yaml.example $@
+
+clean:
+	rm -f ui/src/graphql/schema.json
+	rm -f ui/src/generated/*.ts

@@ -29,13 +29,13 @@ class Query(graphene.ObjectType):
     all_requests = SQLAlchemyConnectionField(Request.connection)
     all_tasks = SQLAlchemyConnectionField(Task.connection)
     all_images = SQLAlchemyConnectionField(Image.connection)
-    # Disable sorting over this field
-    # all_departments = SQLAlchemyConnectionField(Department.connection, sort=None)
 
 
 schema = graphene.Schema(query=Query)
 
 
 def export():
-    with open('ui/graphql/schema.json', 'w') as fp:
-        json.dump(schema.introspect(), fp)
+    with open('ui/src/graphql/schema.json', 'w') as f:
+        json.dump(schema.introspect(), f)
+    # with open('ui/src/graphql/schema.graphql', 'w') as f:
+    #     f.write(str(schema))

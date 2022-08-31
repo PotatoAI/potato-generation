@@ -1,0 +1,10 @@
+query AllRequests {
+  allRequests {
+    edges {
+      node {
+        id,
+        prompt,
+      }
+    }
+  }
+}
