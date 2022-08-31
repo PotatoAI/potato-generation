@@ -46,7 +46,7 @@ class CreateRequest(graphene.Mutation):
         return CreateRequest(request=request, ok=ok)
 
 class Mutation(graphene.ObjectType):
-    request = CreateRequest.Field()
+    create_request = CreateRequest.Field()
 
 class Subscription(graphene.ObjectType):
     change_notification = graphene.String()
