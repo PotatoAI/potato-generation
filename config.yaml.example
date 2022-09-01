@@ -5,6 +5,6 @@ db:
   database: main.db
   echo: true
 gen:
-  inference_steps: 50
+  inference_steps: 100
   batch_size: 1
   batch_count: 1
