@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef, MutableRefObject } from "react";
 import {
   useAllRequestsQuery,
   useAllTasksQuery,
   useAllImagesQuery,
-  useChangeNotificationSubscription,
+  useRequestsActionMutation,
   RequestSortEnum,
   TaskSortEnum,
   ImageSortEnum,
@@ -12,9 +12,11 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { ChaoticOrbit } from "@uiball/loaders";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
+import Portal from '@mui/material/Portal';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -84,8 +86,9 @@ const AppTabs = (props: {
 const dateColW = 150;
 const gridSX = { height: "calc(100vh - 70px)", width: "100%" };
 
-const RequestsDataGrid = () => {
-  const [result] = useAllRequestsQuery({
+const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
+  const [selected, setSelected] = useState<Array<string>>([]);
+  const [result, refresh] = useAllRequestsQuery({
     variables: { sort: RequestSortEnum.CreatedOnDesc },
   });
 
@@ -114,6 +117,20 @@ const RequestsDataGrid = () => {
 
   const rows = data?.allRequests?.edges?.map((edge) => edge?.node) ?? [];
 
+  const [actionResult, action] = useRequestsActionMutation();
+
+  const approveSelected = async () => {
+    await action({ids: selected, action: "approve"});
+    console.log(selected)
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
+  const deleteSelected = async () => {
+    await action({ids: selected, action: "delete"});
+    console.log(selected)
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
   const dataGrid = (
     <Box sx={gridSX}>
       <DataGrid
@@ -123,6 +140,7 @@ const RequestsDataGrid = () => {
         rowsPerPageOptions={[5]}
         checkboxSelection
         disableSelectionOnClick
+        onSelectionModelChange={(ids) => setSelected(ids as string[])}
       />
     </Box>
   );
@@ -131,11 +149,15 @@ const RequestsDataGrid = () => {
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
       {fetching ? loader : dataGrid}
+      <Portal container={props.portalRef.current}>
+        <Button onClick={approveSelected}>Approve</Button>
+        <Button onClick={deleteSelected}>Delete</Button>
+      </Portal>
     </>
   );
 };
 
-const TasksDataGrid = () => {
+const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   const [result] = useAllTasksQuery({
     variables: { sort: TaskSortEnum.CreatedOnDesc },
   });
@@ -181,7 +203,7 @@ const TasksDataGrid = () => {
   );
 };
 
-const ImagesDataGrid = () => {
+const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   const [result] = useAllImagesQuery({
     variables: { sort: ImageSortEnum.CreatedOnDesc },
   });
@@ -225,18 +247,19 @@ const App = () => {
   const allTabs = ["requests", "tasks", "images"];
   const [currentTabI, setCurrentTabI] = useState(0);
   const currentTab = allTabs[currentTabI];
+  const container = useRef(null)
 
   // const [res] = useChangeNotificationSubscription();
   // console.log(res);
 
-  let dataGrid = <RequestsDataGrid />;
+  let dataGrid = <RequestsDataGrid portalRef={container} />;
 
   if (currentTab === "tasks") {
-    dataGrid = <TasksDataGrid />;
+    dataGrid = <TasksDataGrid portalRef={container} />;
   }
 
   if (currentTab === "images") {
-    dataGrid = <ImagesDataGrid />;
+    dataGrid = <ImagesDataGrid portalRef={container} />;
   }
 
   return (
@@ -246,6 +269,7 @@ const App = () => {
         changeTab={setCurrentTabI}
         allTabs={allTabs}
       />
+      <Box ref={container}></Box>
       {dataGrid}
     </Box>
   );

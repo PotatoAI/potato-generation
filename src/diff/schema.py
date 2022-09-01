@@ -18,8 +18,14 @@ class Request(Base):
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
-    tasks = relationship("Task", cascade="all, delete-orphan")
-    images = relationship("Image", cascade="all, delete-orphan")
+    tasks = relationship("Task",
+                         cascade="all, delete",
+                         backref="request",
+                         passive_deletes=True)
+    images = relationship("Image",
+                          cascade="all, delete",
+                          backref="request",
+                          passive_deletes=True)
 
 
 class Task(Base):
@@ -35,8 +41,11 @@ class Task(Base):
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
-    request_id = Column(Integer, ForeignKey('requests.id'))
-    images = relationship("Image", cascade="all, delete-orphan")
+    request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
+    images = relationship("Image",
+                          cascade="all, delete",
+                          backref="task",
+                          passive_deletes=True)
 
 
 class Image(Base):
@@ -48,5 +57,5 @@ class Image(Base):
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
-    request_id = Column(Integer, ForeignKey('requests.id'))
-    task_id = Column(Integer, ForeignKey('tasks.id'))
+    request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
+    task_id = Column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'))

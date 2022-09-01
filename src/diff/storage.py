@@ -3,6 +3,7 @@ from sqlalchemy import desc
 from logging import info
 from sqlalchemy.orm import scoped_session
 from diff.config import DBConfig
+from typing import List
 import diff.db
 
 db_session: scoped_session
@@ -45,9 +46,18 @@ def add_new_request(prompt: str, kind: str = "diffusion", priority=0):
     return req
 
 
-def approve_request(id):
-    req = db_session.query(Request).filter(Request.id == id).limit(1).one()
-    req.approved = True
+def approve_requests(ids: List[int]):
+    reqs = db_session.query(Request).filter(Request.id.in_(ids)).all()
+    print(reqs)
+    for req in reqs:
+        req.approved = True
+    db_session.commit()
+
+
+def delete_requests(ids: List[int]):
+    print(ids)
+    reqs = db_session.query(Request).filter(Request.id.in_(ids)).delete()
+    print(reqs)
     db_session.commit()
 
 

@@ -16,11 +16,6 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type ApproveRequest = {
-  __typename?: 'ApproveRequest';
-  ok?: Maybe<Scalars['Boolean']>;
-};
-
 export type CreateRequest = {
   __typename?: 'CreateRequest';
   ok?: Maybe<Scalars['Boolean']>;
@@ -76,18 +71,19 @@ export enum ImageSortEnum {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  approveRequest?: Maybe<ApproveRequest>;
   createRequest?: Maybe<CreateRequest>;
-};
-
-
-export type MutationApproveRequestArgs = {
-  id?: InputMaybe<Scalars['String']>;
+  requestsAction?: Maybe<RequestsAction>;
 };
 
 
 export type MutationCreateRequestArgs = {
   prompt?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationRequestsActionArgs = {
+  action?: InputMaybe<Scalars['String']>;
+  ids?: InputMaybe<Array<Scalars['String']>>;
 };
 
 /** An object with an ID */
@@ -217,6 +213,11 @@ export enum RequestSortEnum {
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
 
+export type RequestsAction = {
+  __typename?: 'RequestsAction';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
 export type Task = Node & {
   __typename?: 'Task';
   createdOn?: Maybe<Scalars['DateTime']>;
@@ -310,12 +311,13 @@ export type CreateRequestMutationVariables = Exact<{
 
 export type CreateRequestMutation = { __typename?: 'Mutation', createRequest?: { __typename?: 'CreateRequest', ok?: boolean | null, request?: { __typename?: 'Request', id: string } | null } | null };
 
-export type ApproveRequestMutationVariables = Exact<{
-  id?: InputMaybe<Scalars['String']>;
+export type RequestsActionMutationVariables = Exact<{
+  ids?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  action?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type ApproveRequestMutation = { __typename?: 'Mutation', approveRequest?: { __typename?: 'ApproveRequest', ok?: boolean | null } | null };
+export type RequestsActionMutation = { __typename?: 'Mutation', requestsAction?: { __typename?: 'RequestsAction', ok?: boolean | null } | null };
 
 
 export const AllRequestsDocument = gql`
@@ -425,14 +427,14 @@ export const CreateRequestDocument = gql`
 export function useCreateRequestMutation() {
   return Urql.useMutation<CreateRequestMutation, CreateRequestMutationVariables>(CreateRequestDocument);
 };
-export const ApproveRequestDocument = gql`
-    mutation ApproveRequest($id: String) {
-  approveRequest(id: $id) {
+export const RequestsActionDocument = gql`
+    mutation RequestsAction($ids: [String!], $action: String) {
+  requestsAction(ids: $ids, action: $action) {
     ok
   }
 }
     `;
 
-export function useApproveRequestMutation() {
-  return Urql.useMutation<ApproveRequestMutation, ApproveRequestMutationVariables>(ApproveRequestDocument);
+export function useRequestsActionMutation() {
+  return Urql.useMutation<RequestsActionMutation, RequestsActionMutationVariables>(RequestsActionDocument);
 };

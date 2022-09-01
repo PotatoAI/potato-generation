@@ -4,11 +4,12 @@ import json
 import asyncio
 import logging
 import diff.db
+import logging
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
-from diff.storage import add_new_request, approve_request
+from diff.storage import add_new_request, approve_requests, delete_requests
 from base64 import b64decode
 
 
@@ -58,21 +59,29 @@ class CreateRequest(graphene.Mutation):
         return CreateRequest(request=request, ok=ok)
 
 
-class ApproveRequest(graphene.Mutation):
+class RequestsAction(graphene.Mutation):
     class Arguments:
-        id = graphene.String()
+        ids = graphene.List(graphene.NonNull(graphene.String))
+        action = graphene.String()
 
     ok = graphene.Boolean()
 
-    def mutate(root, info, id):
-        approve_request(real_id(id))
+    def mutate(root, info, ids, action):
+        real_ids = list(map(real_id, ids))
+
+        logging.info(f"Running {action} action on {real_ids}")
+        if action == 'approve':
+            approve_requests(real_ids)
+        if action == 'delete':
+            delete_requests(real_ids)
+
         ok = True
-        return ApproveRequest(ok=ok)
+        return RequestsAction(ok=ok)
 
 
 class Mutation(graphene.ObjectType):
     create_request = CreateRequest.Field()
-    approve_request = ApproveRequest.Field()
+    requests_action = RequestsAction.Field()
 
 
 # class Subscription(graphene.ObjectType):
