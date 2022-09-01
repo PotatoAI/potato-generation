@@ -86,8 +86,8 @@ mutation CreateRequest($prompt: String) {
   }
 }
 
-mutation RequestsAction($ids: [String!], $action: String) {
-  requestsAction(ids: $ids, action: $action) {
+mutation DoAction($ids: [String!], $action: String!, $model: String!) {
+  doAction(ids: $ids, action: $action, model: $model) {
     ok
   }
 }

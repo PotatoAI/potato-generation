@@ -22,14 +22,21 @@ export type CreateRequest = {
   request?: Maybe<Request>;
 };
 
+export type DoAction = {
+  __typename?: 'DoAction';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
 export type Image = Node & {
   __typename?: 'Image';
   createdOn?: Maybe<Scalars['DateTime']>;
   filename?: Maybe<Scalars['String']>;
   /** The ID of the object. */
   id: Scalars['ID'];
+  request?: Maybe<Request>;
   requestId?: Maybe<Scalars['Int']>;
   selected?: Maybe<Scalars['Boolean']>;
+  task?: Maybe<Task>;
   taskId?: Maybe<Scalars['Int']>;
   updatedOn?: Maybe<Scalars['DateTime']>;
 };
@@ -72,7 +79,7 @@ export enum ImageSortEnum {
 export type Mutation = {
   __typename?: 'Mutation';
   createRequest?: Maybe<CreateRequest>;
-  requestsAction?: Maybe<RequestsAction>;
+  doAction?: Maybe<DoAction>;
 };
 
 
@@ -81,9 +88,10 @@ export type MutationCreateRequestArgs = {
 };
 
 
-export type MutationRequestsActionArgs = {
-  action?: InputMaybe<Scalars['String']>;
+export type MutationDoActionArgs = {
+  action: Scalars['String'];
   ids?: InputMaybe<Array<Scalars['String']>>;
+  model: Scalars['String'];
 };
 
 /** An object with an ID */
@@ -213,11 +221,6 @@ export enum RequestSortEnum {
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
 
-export type RequestsAction = {
-  __typename?: 'RequestsAction';
-  ok?: Maybe<Scalars['Boolean']>;
-};
-
 export type Task = Node & {
   __typename?: 'Task';
   createdOn?: Maybe<Scalars['DateTime']>;
@@ -227,6 +230,7 @@ export type Task = Node & {
   images?: Maybe<ImageConnection>;
   kind: Scalars['String'];
   priority?: Maybe<Scalars['Int']>;
+  request?: Maybe<Request>;
   requestId?: Maybe<Scalars['Int']>;
   running?: Maybe<Scalars['Boolean']>;
   status: Scalars['String'];
@@ -311,13 +315,14 @@ export type CreateRequestMutationVariables = Exact<{
 
 export type CreateRequestMutation = { __typename?: 'Mutation', createRequest?: { __typename?: 'CreateRequest', ok?: boolean | null, request?: { __typename?: 'Request', id: string } | null } | null };
 
-export type RequestsActionMutationVariables = Exact<{
+export type DoActionMutationVariables = Exact<{
   ids?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
-  action?: InputMaybe<Scalars['String']>;
+  action: Scalars['String'];
+  model: Scalars['String'];
 }>;
 
 
-export type RequestsActionMutation = { __typename?: 'Mutation', requestsAction?: { __typename?: 'RequestsAction', ok?: boolean | null } | null };
+export type DoActionMutation = { __typename?: 'Mutation', doAction?: { __typename?: 'DoAction', ok?: boolean | null } | null };
 
 
 export const AllRequestsDocument = gql`
@@ -427,14 +432,14 @@ export const CreateRequestDocument = gql`
 export function useCreateRequestMutation() {
   return Urql.useMutation<CreateRequestMutation, CreateRequestMutationVariables>(CreateRequestDocument);
 };
-export const RequestsActionDocument = gql`
-    mutation RequestsAction($ids: [String!], $action: String) {
-  requestsAction(ids: $ids, action: $action) {
+export const DoActionDocument = gql`
+    mutation DoAction($ids: [String!], $action: String!, $model: String!) {
+  doAction(ids: $ids, action: $action, model: $model) {
     ok
   }
 }
     `;
 
-export function useRequestsActionMutation() {
-  return Urql.useMutation<RequestsActionMutation, RequestsActionMutationVariables>(RequestsActionDocument);
+export function useDoActionMutation() {
+  return Urql.useMutation<DoActionMutation, DoActionMutationVariables>(DoActionDocument);
 };

@@ -46,6 +46,20 @@ def add_new_request(prompt: str, kind: str = "diffusion", priority=0):
     return req
 
 
+def reschedule_tasks(ids: List[int]):
+    tasks = db_session.query(Task).filter(Task.id.in_(ids)).all()
+    for task in tasks:
+        schedule_request(task.request_id)
+    db_session.commit()
+
+
+def select_images(ids: List[int]):
+    imgs = db_session.query(Image).filter(Image.id.in_(ids)).all()
+    for img in imgs:
+        img.selected = True
+    db_session.commit()
+
+
 def approve_requests(ids: List[int]):
     reqs = db_session.query(Request).filter(Request.id.in_(ids)).all()
     print(reqs)
@@ -55,9 +69,17 @@ def approve_requests(ids: List[int]):
 
 
 def delete_requests(ids: List[int]):
-    print(ids)
-    reqs = db_session.query(Request).filter(Request.id.in_(ids)).delete()
-    print(reqs)
+    db_session.query(Request).filter(Request.id.in_(ids)).delete()
+    db_session.commit()
+
+
+def delete_tasks(ids: List[int]):
+    db_session.query(Task).filter(Task.id.in_(ids)).delete()
+    db_session.commit()
+
+
+def delete_images(ids: List[int]):
+    db_session.query(Image).filter(Image.id.in_(ids)).delete()
     db_session.commit()
 
 

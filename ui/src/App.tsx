@@ -3,7 +3,7 @@ import {
   useAllRequestsQuery,
   useAllTasksQuery,
   useAllImagesQuery,
-  useRequestsActionMutation,
+  useDoActionMutation,
   RequestSortEnum,
   TaskSortEnum,
   ImageSortEnum,
@@ -122,20 +122,20 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
 
   const rows = data?.allRequests?.edges?.map((edge) => edge?.node) ?? [];
 
-  const [actionResult, action] = useRequestsActionMutation();
+  const [actionResult, action] = useDoActionMutation();
 
   const approveSelected = async () => {
-    await action({ids: selected, action: "approve"});
+    await action({ids: selected, action: "approve", model: "request"});
     await refresh({ requestPolicy: 'network-only' });
   }
 
   const deleteSelected = async () => {
-    await action({ids: selected, action: "delete"});
+    await action({ids: selected, action: "delete", model: "request"});
     await refresh({ requestPolicy: 'network-only' });
   }
 
   const reRunSelected = async () => {
-    await action({ids: selected, action: "re-run"});
+    await action({ids: selected, action: "re-run", model: "request"});
     await refresh({ requestPolicy: 'network-only' });
   }
 
@@ -158,9 +158,9 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
       <p>{error ? JSON.stringify(error) : ""}</p>
       {fetching ? loader : dataGrid}
       <Portal container={props.portalRef.current}>
-        <Button disabled={selected.length === 0} onClick={approveSelected}>Approve</Button>
-        <Button disabled={selected.length === 0} onClick={deleteSelected}>Delete</Button>
-        <Button disabled={selected.length === 0} onClick={reRunSelected}>Re-Run</Button>
+        <Button disabled={selected.length === 0} onClick={approveSelected} color="success">Approve</Button>
+        <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
+        <Button disabled={selected.length === 0} onClick={reRunSelected} color="warning">Re-Run</Button>
         <RefreshButton refresh={() => refresh({ requestPolicy: 'network-only' })} />
       </Portal>
     </>
@@ -168,7 +168,8 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
 };
 
 const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
-  const [result] = useAllTasksQuery({
+  const [selected, setSelected] = useState<Array<string>>([]);
+  const [result, refresh] = useAllTasksQuery({
     variables: { sort: TaskSortEnum.CreatedOnDesc },
   });
 
@@ -192,6 +193,18 @@ const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
 
   const rows = data?.allTasks?.edges?.map((edge) => edge?.node) ?? [];
 
+  const [actionResult, action] = useDoActionMutation();
+
+  const deleteSelected = async () => {
+    await action({ids: selected, action: "delete", model: "task"});
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
+  const reRunSelected = async () => {
+    await action({ids: selected, action: "re-run", model: "task"});
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
   const dataGrid = (
     <Box sx={gridSX}>
       <DataGrid
@@ -201,6 +214,7 @@ const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
         rowsPerPageOptions={[5]}
         checkboxSelection
         disableSelectionOnClick
+        onSelectionModelChange={(ids) => setSelected(ids as string[])}
       />
     </Box>
   );
@@ -209,12 +223,18 @@ const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
       {fetching ? loader : dataGrid}
+      <Portal container={props.portalRef.current}>
+        <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
+        <Button disabled={selected.length === 0} onClick={reRunSelected} color="warning">Re-Run</Button>
+        <RefreshButton refresh={() => refresh({ requestPolicy: 'network-only' })} />
+      </Portal>
     </>
   );
 };
 
 const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
-  const [result] = useAllImagesQuery({
+  const [selected, setSelected] = useState<Array<string>>([]);
+  const [result, refresh] = useAllImagesQuery({
     variables: { sort: ImageSortEnum.CreatedOnDesc },
   });
 
@@ -232,6 +252,18 @@ const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
 
   const rows = data?.allImages?.edges?.map((edge) => edge?.node) ?? [];
 
+  const [actionResult, action] = useDoActionMutation();
+
+  const selectSelected = async () => {
+    await action({ids: selected, action: "select", model: "image"});
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
+  const deleteSelected = async () => {
+    await action({ids: selected, action: "delete", model: "image"});
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
   const dataGrid = (
     <Box sx={gridSX}>
       <DataGrid
@@ -241,6 +273,7 @@ const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
         rowsPerPageOptions={[5]}
         checkboxSelection
         disableSelectionOnClick
+        onSelectionModelChange={(ids) => setSelected(ids as string[])}
       />
     </Box>
   );
@@ -249,6 +282,11 @@ const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
       {fetching ? loader : dataGrid}
+      <Portal container={props.portalRef.current}>
+        <Button disabled={selected.length === 0} onClick={selectSelected} color="success">Select</Button>
+        <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
+        <RefreshButton refresh={() => refresh({ requestPolicy: 'network-only' })} />
+      </Portal>
     </>
   );
 };

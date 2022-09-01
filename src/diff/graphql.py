@@ -9,7 +9,7 @@ from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
-from diff.storage import add_new_request, approve_requests, delete_requests, schedule_request
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, schedule_request, reschedule_tasks, select_images
 from base64 import b64decode
 
 
@@ -59,32 +59,56 @@ class CreateRequest(graphene.Mutation):
         return CreateRequest(request=request, ok=ok)
 
 
-class RequestsAction(graphene.Mutation):
+class DoAction(graphene.Mutation):
     class Arguments:
         ids = graphene.List(graphene.NonNull(graphene.String))
-        action = graphene.String()
+        action = graphene.NonNull(graphene.String)
+        model = graphene.NonNull(graphene.String)
 
     ok = graphene.Boolean()
 
-    def mutate(root, info, ids, action):
+    def mutate(root, info, ids, action, model):
+        ok = DoAction(ok=True)
+
         real_ids = list(map(real_id, ids))
 
-        logging.info(f"Running {action} action on {real_ids}")
-        if action == 'approve':
-            approve_requests(real_ids)
-        if action == 'delete':
-            delete_requests(real_ids)
-        if action == 're-run':
-            for rid in real_ids:
-                schedule_request(rid)
+        logging.info(f"Running {action} action on {model} {real_ids}")
 
-        ok = True
-        return RequestsAction(ok=ok)
+        if action == 'approve' and model == 'request':
+            approve_requests(real_ids)
+            return ok
+
+        if action == 'delete':
+            if model == 'request':
+                delete_requests(real_ids)
+                return ok
+            if model == 'task':
+                delete_tasks(real_ids)
+                return ok
+            if model == 'image':
+                delete_images(real_ids)
+                return ok
+
+        if action == 're-run':
+            if model == 'request':
+                for rid in real_ids:
+                    schedule_request(rid)
+                return ok
+            if model == 'task':
+                reschedule_tasks(real_ids)
+                return ok
+
+        if action == 'select' and model == 'image':
+            select_images(real_ids)
+            return ok
+
+        logging.error(f"Unknown action {action} for model {model}")
+        return DoAction(ok=False)
 
 
 class Mutation(graphene.ObjectType):
     create_request = CreateRequest.Field()
-    requests_action = RequestsAction.Field()
+    do_action = DoAction.Field()
 
 
 # class Subscription(graphene.ObjectType):
