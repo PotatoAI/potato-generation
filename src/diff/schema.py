@@ -1,6 +1,7 @@
 from sqlalchemy import Integer, String, Column, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import OID
 from datetime import datetime
 
 Base = declarative_base()
@@ -59,3 +60,4 @@ class Image(Base):
                         onupdate=datetime.now)
     request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
     task_id = Column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'))
+    oid = Column(OID)

@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from diff.config import DBConfig
 from diff.schema import Base
@@ -13,7 +14,7 @@ def db_url(cfg: DBConfig):
     return "unknown"
 
 
-def connect(cfg: DBConfig):
+def connect(cfg: DBConfig) -> Engine:
     return create_engine(db_url(cfg), echo=bool(cfg.echo))
 
 
@@ -22,8 +23,7 @@ def migrate(cfg: DBConfig):
     Base.metadata.create_all(engine)
 
 
-def init_session(cfg: DBConfig) -> scoped_session:
-    engine = connect(cfg)
+def init_session(engine: Engine) -> scoped_session:
     session = scoped_session(
         sessionmaker(
             autocommit=False,

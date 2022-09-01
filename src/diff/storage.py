@@ -2,16 +2,36 @@ from diff.schema import Request, Task, Image
 from sqlalchemy import desc
 from logging import info
 from sqlalchemy.orm import scoped_session
+from sqlalchemy.engine import Engine
 from diff.config import DBConfig
 from typing import List
 import diff.db
 
+db_engine: Engine
 db_session: scoped_session
 
 
+def save_binary_file(fname: str) -> int:
+    conn = db_engine.raw_connection()
+    l_obj = conn.lobject(0, 'wb', 0)
+    with open(fname, 'rb') as f:
+        l_obj.write(f.read())
+    conn.commit()
+    conn.close()
+    return l_obj.oid
+
+
+def get_binary_file(oid: int) -> bytearray:
+    conn = db_engine.raw_connection()
+    l_obj = conn.lobject(oid, 'bb')
+    return l_obj.read()
+
+
 def init_db_session(cfg: DBConfig):
+    global db_engine
+    db_engine = diff.db.connect(cfg)
     global db_session
-    db_session = diff.db.init_session(cfg)
+    db_session = diff.db.init_session(db_engine)
 
 
 def commit():
@@ -100,10 +120,12 @@ def get_top_task(kind) -> Task:
 
 
 def save_image(fname: str, rid: int, tid: int):
+    oid = save_binary_file(fname)
     img = Image(
         request_id=rid,
         task_id=tid,
         filename=fname,
+        oid=oid,
     )
     db_session.add(img)
     db_session.commit()
