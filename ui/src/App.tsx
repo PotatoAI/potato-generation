@@ -13,10 +13,13 @@ import { ChaoticOrbit } from "@uiball/loaders";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Portal from '@mui/material/Portal';
+
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,6 +60,10 @@ const loader = (
   </Box>
 );
 
+const RefreshButton = (props: {refresh: () => void}) => {
+  return <IconButton onClick={props.refresh}><RefreshIcon /></IconButton>
+}
+
 const AppTabs = (props: {
   currentTab: number;
   changeTab: (tab: number) => void;
@@ -69,7 +76,6 @@ const AppTabs = (props: {
   };
 
   return (
-    <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
       <Tabs
         value={currentTab}
         onChange={handleChange}
@@ -79,7 +85,6 @@ const AppTabs = (props: {
           <Tab label={tab} {...a11yProps(i)} key={tab} />
         ))}
       </Tabs>
-    </Box>
   );
 };
 
@@ -156,6 +161,7 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
         <Button disabled={selected.length === 0} onClick={approveSelected}>Approve</Button>
         <Button disabled={selected.length === 0} onClick={deleteSelected}>Delete</Button>
         <Button disabled={selected.length === 0} onClick={reRunSelected}>Re-Run</Button>
+        <RefreshButton refresh={() => refresh({ requestPolicy: 'network-only' })} />
       </Portal>
     </>
   );
@@ -268,12 +274,14 @@ const App = () => {
 
   return (
     <Box>
-      <AppTabs
-        currentTab={currentTabI}
-        changeTab={setCurrentTabI}
-        allTabs={allTabs}
-      />
-      <Box ref={container}></Box>
+      <Box sx={{ borderBottom: 1, borderColor: "divider", justifyContent: 'space-between', flexDirection: 'row', display: 'flex' }}>
+        <AppTabs
+          currentTab={currentTabI}
+          changeTab={setCurrentTabI}
+          allTabs={allTabs}
+        />
+        <Box sx={{margin: 'auto 15px'}} ref={container}></Box>
+      </Box>
       {dataGrid}
     </Box>
   );
