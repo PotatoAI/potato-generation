@@ -29,16 +29,17 @@ type ModalProps = {
 
 const MediaModal = (props: Props & ModalProps) => {
   const { oids, kind, close } = props;
+  const [focused, setFocused] = useState(0);
+  const current = oids[focused];
 
   const [result, refresh] = useLargeObjectsQuery({
-    variables: { oids: props.oids },
+    variables: { oids: [current] },
     /* requestPolicy: "network-only", */
   });
 
   const { fetching, data, error } = result;
 
   const allData = result.data?.largeObjects?.map((lo) => lo?.data) || [];
-  const [focused, setFocused] = useState(0);
 
   const prev = () => {
     setFocused((focused) => {
@@ -46,13 +47,13 @@ const MediaModal = (props: Props & ModalProps) => {
         return focused - 1;
       }
 
-      return allData.length - 1;
+      return oids.length - 1;
     });
   };
 
   const next = () => {
     setFocused((focused) => {
-      if (focused < allData.length - 1) {
+      if (focused < oids.length - 1) {
         return focused + 1;
       }
 
@@ -61,7 +62,7 @@ const MediaModal = (props: Props & ModalProps) => {
   };
 
   let prefix = "data:image/png;base64,";
-  const mediaData = allData[focused];
+  const mediaData = allData[0];
   const src = `${prefix}${mediaData}`;
   let el = <img width={512} height={512} src={src} />;
 
@@ -75,11 +76,32 @@ const MediaModal = (props: Props & ModalProps) => {
     );
   }
 
-  const label = `${focused + 1} / ${allData.length}`;
+  const label = `${focused + 1} / ${oids.length}`;
+
+  const loader = (
+    <Box sx={{ margin: "auto" }}>
+      <ChaoticOrbit size={25} speed={1.5} color="white" />
+    </Box>
+  );
 
   const modalContent = (
     <Box>
-      {el}
+      {!fetching ? (
+        el
+      ) : (
+        <Box
+          width="512px"
+          height="512px"
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            verticalAlign: "middle",
+            padding: "auto",
+          }}
+        >
+          {loader}
+        </Box>
+      )}
       {error && JSON.stringify(error)}
       <Box sx={{ justifyContent: "space-between", display: "flex" }}>
         <IconButton onClick={prev}>
@@ -95,8 +117,6 @@ const MediaModal = (props: Props & ModalProps) => {
     </Box>
   );
 
-  const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
-
   return (
     <Modal
       open={true}
@@ -105,7 +125,7 @@ const MediaModal = (props: Props & ModalProps) => {
       aria-describedby="modal-modal-description"
     >
       <Box component="div" sx={style}>
-        {fetching ? loader : modalContent}
+        {modalContent}
       </Box>
     </Modal>
   );
