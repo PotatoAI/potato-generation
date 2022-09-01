@@ -3,10 +3,12 @@ import {
   useAllRequestsQuery,
   useAllTasksQuery,
   useAllImagesQuery,
+  useAllVideosQuery,
   useDoActionMutation,
   RequestSortEnum,
   TaskSortEnum,
   ImageSortEnum,
+  VideoSortEnum,
 } from "./generated/graphql";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
@@ -21,7 +23,7 @@ import Portal from "@mui/material/Portal";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 import { LoadingModal } from "./Loading";
-import { ImageViewer } from "./ImageViewer";
+import { MediaViewer } from "./MediaViewer";
 import { Submit } from "./Submit";
 
 interface TabPanelProps {
@@ -107,20 +109,29 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
       field: "prompt",
       width: 250,
     },
-    { field: "approved", width: 90 },
-    { field: "generated", width: 90 },
-    { field: "kind" },
-    { field: "createdOn", width: dateColW },
-    { field: "updatedOn", width: dateColW },
     {
       field: "images",
       renderCell: (p) => {
         const oids = p.row.images.edges.map(
           (i: { node: { oid: number } }) => i.node.oid
         );
-        return <ImageViewer oids={oids} />;
+        return <MediaViewer oids={oids} kind="image" />;
       },
     },
+    {
+      field: "videos",
+      renderCell: (p) => {
+        const oids = p.row.videos.edges.map(
+          (i: { node: { oid: number } }) => i.node.oid
+        );
+        return <MediaViewer oids={oids} kind="video" />;
+      },
+    },
+    { field: "approved", width: 90 },
+    { field: "generated", width: 90 },
+    { field: "kind" },
+    { field: "createdOn", width: dateColW },
+    { field: "updatedOn", width: dateColW },
     {
       field: "tasks",
       valueGetter: (params) => params.row.tasks["edges"].length,
@@ -146,6 +157,11 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     await refresh({ requestPolicy: "network-only" });
   };
 
+  const genVid = async () => {
+    await action({ ids: selected, action: "generate-video", model: "request" });
+    await refresh({ requestPolicy: "network-only" });
+  };
+
   const dataGrid = (
     <Box sx={gridSX}>
       <DataGrid
@@ -163,7 +179,7 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      <LoadingModal loading={fetching} />
+      <LoadingModal loading={fetching || actionResult.fetching} />
       {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button
@@ -172,6 +188,13 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
           color="success"
         >
           Approve
+        </Button>
+        <Button
+          disabled={selected.length === 0}
+          onClick={genVid}
+          color="success"
+        >
+          make video
         </Button>
         <Button
           disabled={selected.length === 0}
@@ -225,7 +248,7 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
         const oids = p.row.images.edges.map(
           (i: { node: { oid: number } }) => i.node.oid
         );
-        return <ImageViewer oids={oids} />;
+        return <MediaViewer oids={oids} kind="image" />;
       },
     },
     { field: "createdOn", width: dateColW },
@@ -264,7 +287,7 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      <LoadingModal loading={fetching} />
+      <LoadingModal loading={fetching || actionResult.fetching} />
       {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button
@@ -303,7 +326,7 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     {
       field: "oid",
       renderCell: (p) => {
-        return <ImageViewer oids={[p.row.oid]} />;
+        return <MediaViewer oids={[p.row.oid]} kind="image" />;
       },
     },
     { field: "filename" },
@@ -345,7 +368,88 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      <LoadingModal loading={fetching} />
+      <LoadingModal loading={fetching || actionResult.fetching} />
+      {dataGrid}
+      <Portal container={props.portalRef.current}>
+        <Button
+          disabled={selected.length === 0}
+          onClick={selectSelected}
+          color="success"
+        >
+          Select
+        </Button>
+        <Button
+          disabled={selected.length === 0}
+          onClick={deleteSelected}
+          color="error"
+        >
+          Delete
+        </Button>
+        <RefreshButton
+          refresh={() => refresh({ requestPolicy: "network-only" })}
+        />
+      </Portal>
+    </>
+  );
+};
+
+const VideosDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
+  const [selected, setSelected] = useState<Array<string>>([]);
+  const [result, refresh] = useAllVideosQuery({
+    variables: { sort: VideoSortEnum.CreatedOnDesc },
+    requestPolicy: "network-only",
+  });
+
+  const { data, fetching, error } = result;
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "oid",
+      renderCell: (p) => {
+        return <MediaViewer oids={[p.row.oid]} kind="video" />;
+      },
+    },
+    { field: "filename" },
+    { field: "selected" },
+    { field: "createdOn", width: dateColW },
+    { field: "updatedOn", width: dateColW },
+    { field: "requestId" },
+    { field: "taskId" },
+  ];
+
+  const rows = data?.allVideos?.edges?.map((edge) => edge?.node) ?? [];
+
+  const [actionResult, action] = useDoActionMutation();
+
+  const selectSelected = async () => {
+    await action({ ids: selected, action: "select", model: "video" });
+    await refresh({ requestPolicy: "network-only" });
+  };
+
+  const deleteSelected = async () => {
+    await action({ ids: selected, action: "delete", model: "video" });
+    await refresh({ requestPolicy: "network-only" });
+  };
+
+  const dataGrid = (
+    <Box sx={gridSX}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={30}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+        disableSelectionOnClick
+        onSelectionModelChange={(ids) => setSelected(ids as string[])}
+      />
+    </Box>
+  );
+
+  return (
+    <>
+      <p>{error ? JSON.stringify(error) : ""}</p>
+      <LoadingModal loading={fetching || actionResult.fetching} />
       {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button
@@ -371,7 +475,7 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
 };
 
 const App = () => {
-  const allTabs = ["requests", "tasks", "images"];
+  const allTabs = ["requests", "tasks", "images", "videos"];
   const [currentTabI, setCurrentTabI] = useState(0);
   const currentTab = allTabs[currentTabI];
   const container = useRef(null);
@@ -387,6 +491,10 @@ const App = () => {
 
   if (currentTab === "images") {
     dataGrid = <ImagesDataGrid portalRef={container} />;
+  }
+
+  if (currentTab === "videos") {
+    dataGrid = <VideosDataGrid portalRef={container} />;
   }
 
   return (

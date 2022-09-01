@@ -29,6 +29,15 @@ query AllRequests($sort: [RequestSortEnum]) {
             }
           }
         },
+        videos {
+          edges {
+            node {
+              id,
+              filename,
+              oid,
+            }
+          }
+        },
       }
     }
   }
@@ -75,6 +84,22 @@ query AllImages($sort: [ImageSortEnum]) {
         updatedOn,
         requestId,
         taskId,
+        oid,
+      }
+    }
+  }
+}
+
+query AllVideos($sort: [VideoSortEnum]) {
+  allVideos(sort: $sort) {
+    edges {
+      node {
+        id,
+        filename,
+        selected,
+        createdOn,
+        updatedOn,
+        requestId,
         oid,
       }
     }

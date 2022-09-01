@@ -27,6 +27,10 @@ class Request(Base):
                           cascade="all, delete",
                           backref="request",
                           passive_deletes=True)
+    videos = relationship("Video",
+                          cascade="all, delete",
+                          backref="request",
+                          passive_deletes=True)
 
 
 class Task(Base):
@@ -61,4 +65,17 @@ class Image(Base):
                         onupdate=datetime.now)
     request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
     task_id = Column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'))
+    oid = Column(OID)
+
+
+class Video(Base):
+    __tablename__ = 'videos'
+    id = Column(Integer(), primary_key=True)
+    filename = Column(String(200), nullable=True)
+    selected = Column(Boolean(), default=False)
+    created_on = Column(DateTime(), default=datetime.now)
+    updated_on = Column(DateTime(),
+                        default=datetime.now,
+                        onupdate=datetime.now)
+    request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
     oid = Column(OID)

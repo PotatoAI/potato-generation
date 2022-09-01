@@ -1,4 +1,4 @@
-from diff.schema import Request, Task, Image
+from diff.schema import Request, Task, Image, Video
 from sqlalchemy import desc
 from logging import info, error
 from sqlalchemy.orm import scoped_session
@@ -148,6 +148,18 @@ def save_image(fname: str, rid: int, tid: int):
     db_session.add(img)
     db_session.commit()
     info(f"Saved img {img.id} -> {img.filename}")
+
+
+def save_video(fname: str, rid: int):
+    oid = save_binary_file(fname)
+    vid = Video(
+        request_id=rid,
+        filename=fname,
+        oid=oid,
+    )
+    db_session.add(vid)
+    db_session.commit()
+    info(f"Saved vid {vid.id} -> {vid.filename}")
 
 
 def get_request(id: int) -> Request:

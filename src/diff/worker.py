@@ -1,9 +1,10 @@
 import time
 import os
 import socket
+from typing import List
 from diff.config import GenConfig
 from diff.gen import Generator
-from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file
+from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video
 from logging import info, error
 
 
@@ -78,8 +79,7 @@ class SlideshowWorker:
     def run(self):
         print('yeah, sure')
 
-    def generate(self):
-        ids = [19]
+    def generate(self, ids: List[int]):
         for id in ids:
             self.generate_one(id)
 
@@ -122,3 +122,4 @@ class SlideshowWorker:
                 fb.write(read_binary_file(f.oid))
 
         os.system(command)
+        save_video(out, req.id)

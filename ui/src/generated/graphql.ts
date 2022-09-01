@@ -129,6 +129,7 @@ export type Query = {
   allImages?: Maybe<ImageConnection>;
   allRequests?: Maybe<RequestConnection>;
   allTasks?: Maybe<TaskConnection>;
+  allVideos?: Maybe<VideoConnection>;
   largeObjects?: Maybe<Array<Maybe<LargeObject>>>;
   node?: Maybe<Node>;
 };
@@ -161,6 +162,15 @@ export type QueryAllTasksArgs = {
 };
 
 
+export type QueryAllVideosArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+  sort?: InputMaybe<Array<InputMaybe<VideoSortEnum>>>;
+};
+
+
 export type QueryLargeObjectsArgs = {
   oids?: InputMaybe<Array<Scalars['Int']>>;
 };
@@ -183,6 +193,7 @@ export type Request = Node & {
   prompt: Scalars['String'];
   tasks?: Maybe<TaskConnection>;
   updatedOn?: Maybe<Scalars['DateTime']>;
+  videos?: Maybe<VideoConnection>;
 };
 
 
@@ -195,6 +206,14 @@ export type RequestImagesArgs = {
 
 
 export type RequestTasksArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type RequestVideosArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
@@ -307,12 +326,60 @@ export enum TaskSortEnum {
   WorkerIdDesc = 'WORKER_ID_DESC'
 }
 
+export type Video = Node & {
+  __typename?: 'Video';
+  createdOn?: Maybe<Scalars['DateTime']>;
+  filename?: Maybe<Scalars['String']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  oid?: Maybe<Scalars['JSONString']>;
+  request?: Maybe<Request>;
+  requestId?: Maybe<Scalars['Int']>;
+  selected?: Maybe<Scalars['Boolean']>;
+  updatedOn?: Maybe<Scalars['DateTime']>;
+};
+
+export type VideoConnection = {
+  __typename?: 'VideoConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<VideoEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `Video` and its cursor. */
+export type VideoEdge = {
+  __typename?: 'VideoEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<Video>;
+};
+
+/** An enumeration. */
+export enum VideoSortEnum {
+  CreatedOnAsc = 'CREATED_ON_ASC',
+  CreatedOnDesc = 'CREATED_ON_DESC',
+  FilenameAsc = 'FILENAME_ASC',
+  FilenameDesc = 'FILENAME_DESC',
+  IdAsc = 'ID_ASC',
+  IdDesc = 'ID_DESC',
+  OidAsc = 'OID_ASC',
+  OidDesc = 'OID_DESC',
+  RequestIdAsc = 'REQUEST_ID_ASC',
+  RequestIdDesc = 'REQUEST_ID_DESC',
+  SelectedAsc = 'SELECTED_ASC',
+  SelectedDesc = 'SELECTED_DESC',
+  UpdatedOnAsc = 'UPDATED_ON_ASC',
+  UpdatedOnDesc = 'UPDATED_ON_DESC'
+}
+
 export type AllRequestsQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<RequestSortEnum>> | InputMaybe<RequestSortEnum>>;
 }>;
 
 
-export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, kind: string, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
+export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, kind: string, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null, videos?: { __typename?: 'VideoConnection', edges: Array<{ __typename?: 'VideoEdge', node?: { __typename?: 'Video', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllTasksQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<TaskSortEnum>> | InputMaybe<TaskSortEnum>>;
@@ -327,6 +394,13 @@ export type AllImagesQueryVariables = Exact<{
 
 
 export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null, oid?: any | null } | null } | null> } | null };
+
+export type AllVideosQueryVariables = Exact<{
+  sort?: InputMaybe<Array<InputMaybe<VideoSortEnum>> | InputMaybe<VideoSortEnum>>;
+}>;
+
+
+export type AllVideosQuery = { __typename?: 'Query', allVideos?: { __typename?: 'VideoConnection', edges: Array<{ __typename?: 'VideoEdge', node?: { __typename?: 'Video', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, oid?: any | null } | null } | null> } | null };
 
 export type LargeObjectsQueryVariables = Exact<{
   oids?: InputMaybe<Array<Scalars['Int']> | Scalars['Int']>;
@@ -377,6 +451,15 @@ export const AllRequestsDocument = gql`
           }
         }
         images {
+          edges {
+            node {
+              id
+              filename
+              oid
+            }
+          }
+        }
+        videos {
           edges {
             node {
               id
@@ -449,6 +532,27 @@ export const AllImagesDocument = gql`
 
 export function useAllImagesQuery(options?: Omit<Urql.UseQueryArgs<AllImagesQueryVariables>, 'query'>) {
   return Urql.useQuery<AllImagesQuery, AllImagesQueryVariables>({ query: AllImagesDocument, ...options });
+};
+export const AllVideosDocument = gql`
+    query AllVideos($sort: [VideoSortEnum]) {
+  allVideos(sort: $sort) {
+    edges {
+      node {
+        id
+        filename
+        selected
+        createdOn
+        updatedOn
+        requestId
+        oid
+      }
+    }
+  }
+}
+    `;
+
+export function useAllVideosQuery(options?: Omit<Urql.UseQueryArgs<AllVideosQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllVideosQuery, AllVideosQueryVariables>({ query: AllVideosDocument, ...options });
 };
 export const LargeObjectsDocument = gql`
     query LargeObjects($oids: [Int!]) {
