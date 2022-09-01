@@ -148,3 +148,7 @@ def save_image(fname: str, rid: int, tid: int):
     db_session.add(img)
     db_session.commit()
     info(f"Saved img {img.id} -> {img.filename}")
+
+
+def get_request(id: int) -> Request:
+    return db_session.query(Request).filter(Request.id == id).one()
