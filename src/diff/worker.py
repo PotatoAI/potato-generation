@@ -35,7 +35,7 @@ class Worker:
                 task.running = True
                 log = f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                 info(log)
-                task.log = f"{task.log}\n{log}"
+                task.log = log
                 commit()
 
                 try:
