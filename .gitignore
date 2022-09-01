@@ -1,5 +1,5 @@
 **/*.pyc
-output/*.png
+output/*
 *.db
 config.yaml
 codegen/schema.json
