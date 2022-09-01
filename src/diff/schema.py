@@ -35,6 +35,7 @@ class Task(Base):
     running = Column(Boolean(), default=False)
     status = Column(String(50), nullable=False, default='new')
     error = Column(Text(), nullable=True)
+    log = Column(Text(), nullable=True)
     priority = Column(Integer(), default=0)
     worker_id = Column(String(100), nullable=False, default='unknown')
     kind = Column(String(100), nullable=False, default='unknown')

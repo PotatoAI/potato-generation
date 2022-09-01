@@ -210,7 +210,11 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     { field: "status" },
     {
       field: "error",
-      width: 250,
+      width: 150,
+    },
+    {
+      field: "log",
+      width: 150,
     },
     { field: "priority" },
     { field: "workerId", width: 120 },

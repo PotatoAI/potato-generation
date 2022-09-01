@@ -36,10 +36,9 @@ class Worker:
                 commit()
 
                 try:
-                    info(
-                        f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
-                    )
-                    time.sleep(20)
+                    log = f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
+                    info(log)
+                    task.log = f"{task.log}\n{log}"
 
                     result = gen.generate(
                         f"request/{request.id}",

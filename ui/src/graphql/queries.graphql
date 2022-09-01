@@ -42,6 +42,7 @@ query AllTasks($sort: [TaskSortEnum]) {
         running,
         status,
         error,
+        log,
         priority,
         workerId,
         kind,
