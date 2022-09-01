@@ -10,6 +10,7 @@ import Modal from "@mui/material/Modal";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
+import Slider from "@mui/material/Slider";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -23,6 +24,7 @@ const style = {
 
 export const Submit = () => {
   const [prompt, setPrompt] = useState("");
+  const [count, setCount] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [createResult, create] = useCreateRequestMutation();
@@ -30,9 +32,10 @@ export const Submit = () => {
 
   const submit = async () => {
     if (prompt.length > 0) {
-      await create({ prompt });
+      await create({ prompt, count });
       setModalOpen(false);
       setPrompt("");
+      setCount(1);
     }
   };
 
@@ -54,14 +57,26 @@ export const Submit = () => {
             height: 300,
           }}
         >
-          {fetching && <ChaoticOrbit size={25} speed={1.5} color="white" />}
           <TextField
             label="Prompt"
             variant="outlined"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
-          <Button onClick={submit}>Submit</Button>
+          Schedule #{count} tasks
+          <Slider
+            aria-label="Volume"
+            value={count}
+            min={1}
+            max={15}
+            onChange={(e, v) => setCount(v as number)}
+          />
+          {!fetching && <Button onClick={submit}>Submit</Button>}
+          {fetching && (
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <ChaoticOrbit size={25} speed={1.5} color="white" />
+            </Box>
+          )}
         </Paper>
       </Box>
     </Modal>
