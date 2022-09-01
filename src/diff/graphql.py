@@ -9,7 +9,7 @@ from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
-from diff.storage import add_new_request, approve_requests, delete_requests
+from diff.storage import add_new_request, approve_requests, delete_requests, schedule_request
 from base64 import b64decode
 
 
@@ -74,6 +74,9 @@ class RequestsAction(graphene.Mutation):
             approve_requests(real_ids)
         if action == 'delete':
             delete_requests(real_ids)
+        if action == 're-run':
+            for rid in real_ids:
+                schedule_request(rid)
 
         ok = True
         return RequestsAction(ok=ok)

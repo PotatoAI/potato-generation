@@ -18,7 +18,7 @@ def commit():
     db_session.commit()
 
 
-def schedule_request(rid: int, priority: int, kind: str = "diffusion"):
+def schedule_request(rid: int, priority: int = 0, kind: str = "diffusion"):
     task = Task(
         request_id=rid,
         priority=priority,

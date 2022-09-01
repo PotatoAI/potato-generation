@@ -121,13 +121,16 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
 
   const approveSelected = async () => {
     await action({ids: selected, action: "approve"});
-    console.log(selected)
     await refresh({ requestPolicy: 'network-only' });
   }
 
   const deleteSelected = async () => {
     await action({ids: selected, action: "delete"});
-    console.log(selected)
+    await refresh({ requestPolicy: 'network-only' });
+  }
+
+  const reRunSelected = async () => {
+    await action({ids: selected, action: "re-run"});
     await refresh({ requestPolicy: 'network-only' });
   }
 
@@ -152,6 +155,7 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
       <Portal container={props.portalRef.current}>
         <Button disabled={selected.length === 0} onClick={approveSelected}>Approve</Button>
         <Button disabled={selected.length === 0} onClick={deleteSelected}>Delete</Button>
+        <Button disabled={selected.length === 0} onClick={reRunSelected}>Re-Run</Button>
       </Portal>
     </>
   );
