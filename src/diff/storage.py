@@ -57,7 +57,10 @@ def schedule_request(rid: int, priority: int = 0, kind: str = "diffusion"):
     info(f"Scheduled new task {task.id}")
 
 
-def add_new_request(prompt: str, kind: str = "diffusion", priority=0):
+def add_new_request(prompt: str,
+                    count: int = 1,
+                    kind: str = "diffusion",
+                    priority=0):
     if not prompt:
         prompt = input("Enter prompt: ")
 
@@ -70,7 +73,8 @@ def add_new_request(prompt: str, kind: str = "diffusion", priority=0):
     db_session.add(req)
     db_session.commit()
     info(f"Created new request {req.id}")
-    schedule_request(req.id, priority, kind=kind)
+    for _ in range(count):
+        schedule_request(req.id, priority, kind=kind)
     return req
 
 

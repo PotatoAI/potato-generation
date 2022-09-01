@@ -94,6 +94,7 @@ export type Mutation = {
 
 
 export type MutationCreateRequestArgs = {
+  count?: InputMaybe<Scalars['Int']>;
   prompt?: InputMaybe<Scalars['String']>;
 };
 
@@ -336,6 +337,7 @@ export type LargeObjectsQuery = { __typename?: 'Query', largeObjects?: Array<{ _
 
 export type CreateRequestMutationVariables = Exact<{
   prompt?: InputMaybe<Scalars['String']>;
+  count?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -461,8 +463,8 @@ export function useLargeObjectsQuery(options?: Omit<Urql.UseQueryArgs<LargeObjec
   return Urql.useQuery<LargeObjectsQuery, LargeObjectsQueryVariables>({ query: LargeObjectsDocument, ...options });
 };
 export const CreateRequestDocument = gql`
-    mutation CreateRequest($prompt: String) {
-  createRequest(prompt: $prompt) {
+    mutation CreateRequest($prompt: String, $count: Int) {
+  createRequest(prompt: $prompt, count: $count) {
     ok
     request {
       id

@@ -88,8 +88,8 @@ query LargeObjects($oids: [Int!]) {
   }
 }
 
-mutation CreateRequest($prompt: String) {
-  createRequest(prompt: $prompt) {
+mutation CreateRequest($prompt: String, $count: Int) {
+  createRequest(prompt: $prompt, count: $count) {
     ok,
     request {
       id

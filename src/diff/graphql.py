@@ -74,12 +74,13 @@ class Query(graphene.ObjectType):
 class CreateRequest(graphene.Mutation):
     class Arguments:
         prompt = graphene.String()
+        count = graphene.Int()
 
     ok = graphene.Boolean()
     request = graphene.Field(lambda: Request)
 
-    def mutate(root, info, prompt):
-        request = add_new_request(prompt)
+    def mutate(root, info, prompt, count):
+        request = add_new_request(prompt, count=count)
         ok = True
         return CreateRequest(request=request, ok=ok)
 
