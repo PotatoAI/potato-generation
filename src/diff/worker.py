@@ -41,7 +41,7 @@ class Worker:
                 try:
 
                     result = gen.generate(
-                        f"request/{request.id}",
+                        request.prompt,
                         batch_size=self.config.batch_size,
                         batch_count=self.config.batch_count,
                         inference_steps=self.config.inference_steps,
