@@ -21,10 +21,18 @@ def save_binary_file(fname: str) -> int:
     return l_obj.oid
 
 
-def get_binary_file(oid: int) -> bytearray:
+def read_binary_file(oid: int) -> bytearray:
     conn = db_engine.raw_connection()
-    l_obj = conn.lobject(oid, 'bb')
+    l_obj = conn.lobject(oid, 'rb')
     return l_obj.read()
+
+
+def delete_binary_file(oid: int) -> bytearray:
+    conn = db_engine.raw_connection()
+    l_obj = conn.lobject(oid, 'n')
+    l_obj.unlink()
+    conn.commit()
+    conn.close()
 
 
 def init_db_session(cfg: DBConfig):
@@ -99,7 +107,10 @@ def delete_tasks(ids: List[int]):
 
 
 def delete_images(ids: List[int]):
-    db_session.query(Image).filter(Image.id.in_(ids)).delete()
+    images = db_session.query(Image).filter(Image.id.in_(ids)).all()
+    for img in images:
+        delete_binary_file(img.oid)
+        img.delete()
     db_session.commit()
 
 
