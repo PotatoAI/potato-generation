@@ -1,6 +1,6 @@
 from diff.schema import Request, Task, Image
 from sqlalchemy import desc
-from logging import info
+from logging import info, error
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.engine import Engine
 from diff.config import DBConfig
@@ -94,7 +94,6 @@ def select_images(ids: List[int]):
 
 def approve_requests(ids: List[int]):
     reqs = db_session.query(Request).filter(Request.id.in_(ids)).all()
-    print(reqs)
     for req in reqs:
         req.approved = True
     db_session.commit()
@@ -113,8 +112,12 @@ def delete_tasks(ids: List[int]):
 def delete_images(ids: List[int]):
     images = db_session.query(Image).filter(Image.id.in_(ids)).all()
     for img in images:
-        delete_binary_file(img.oid)
-        img.delete()
+        try:
+            delete_binary_file(img.oid)
+        except Exception as e:
+            error(e)
+        finally:
+            db_session.delete(img)
     db_session.commit()
 
 
