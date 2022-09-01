@@ -9,7 +9,6 @@ import {
   ImageSortEnum,
 } from "./generated/graphql";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { ChaoticOrbit } from "@uiball/loaders";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -20,6 +19,8 @@ import Typography from "@mui/material/Typography";
 import Portal from '@mui/material/Portal';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
+
+import { LoadingModal } from './Loading';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -54,11 +55,7 @@ function a11yProps(index: number) {
   };
 }
 
-const loader = (
-  <Box justifyContent="center" height="100vh" width="100%">
-    <ChaoticOrbit size={25} speed={1.5} color="white" />
-  </Box>
-);
+const loader = <LoadingModal loading={true} />;
 
 const RefreshButton = (props: {refresh: () => void}) => {
   return <IconButton onClick={props.refresh}><RefreshIcon /></IconButton>
