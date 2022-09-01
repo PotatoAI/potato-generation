@@ -5,12 +5,14 @@ import asyncio
 import logging
 import diff.db
 import logging
+import base64
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, schedule_request, reschedule_tasks, select_images
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, schedule_request, reschedule_tasks, select_images, read_binary_file
 from base64 import b64decode
+from typing import List
 
 
 def real_id(hx: str) -> int:
@@ -39,8 +41,31 @@ class Image(SQLAlchemyObjectType):
         interfaces = (relay.Node, )
 
 
+class LargeObject(graphene.ObjectType):
+    oid = graphene.NonNull(graphene.Int)
+    data = graphene.NonNull(graphene.String)
+
+
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
+
+    large_objects = graphene.List(lambda: LargeObject,
+                                  oids=graphene.List(
+                                      graphene.NonNull(graphene.Int)))
+
+    def resolve_large_objects(self, info, oids: List[int]):
+        response = []
+        for oid in oids:
+            bdata = read_binary_file(oid)
+            b64data = base64.b64encode(bdata).decode('ascii')
+            data = f"data:image/png;base64, {b64data}"
+            response.append(LargeObject(
+                oid=oid,
+                data=data,
+            ))
+
+        return response
+
     all_requests = SQLAlchemyConnectionField(Request.connection)
     all_tasks = SQLAlchemyConnectionField(Task.connection)
     all_images = SQLAlchemyConnectionField(Image.connection)

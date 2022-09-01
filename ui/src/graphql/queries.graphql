@@ -25,6 +25,7 @@ query AllRequests($sort: [RequestSortEnum]) {
             node {
               id,
               filename,
+              oid,
             }
           }
         },
@@ -52,6 +53,7 @@ query AllTasks($sort: [TaskSortEnum]) {
             node {
               id,
               filename,
+              oid,
             }
           }
         },
@@ -72,8 +74,16 @@ query AllImages($sort: [ImageSortEnum]) {
         updatedOn,
         requestId,
         taskId,
+        oid,
       }
     }
+  }
+}
+
+query LargeObjects($oids: [Int!]) {
+  largeObjects(oids: $oids) {
+    oid,
+    data,
   }
 }
 

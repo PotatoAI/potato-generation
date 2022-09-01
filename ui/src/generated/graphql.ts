@@ -14,6 +14,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: any;
+  JSONString: any;
 };
 
 export type CreateRequest = {
@@ -33,6 +34,7 @@ export type Image = Node & {
   filename?: Maybe<Scalars['String']>;
   /** The ID of the object. */
   id: Scalars['ID'];
+  oid?: Maybe<Scalars['JSONString']>;
   request?: Maybe<Request>;
   requestId?: Maybe<Scalars['Int']>;
   selected?: Maybe<Scalars['Boolean']>;
@@ -66,6 +68,8 @@ export enum ImageSortEnum {
   FilenameDesc = 'FILENAME_DESC',
   IdAsc = 'ID_ASC',
   IdDesc = 'ID_DESC',
+  OidAsc = 'OID_ASC',
+  OidDesc = 'OID_DESC',
   RequestIdAsc = 'REQUEST_ID_ASC',
   RequestIdDesc = 'REQUEST_ID_DESC',
   SelectedAsc = 'SELECTED_ASC',
@@ -75,6 +79,12 @@ export enum ImageSortEnum {
   UpdatedOnAsc = 'UPDATED_ON_ASC',
   UpdatedOnDesc = 'UPDATED_ON_DESC'
 }
+
+export type LargeObject = {
+  __typename?: 'LargeObject';
+  data: Scalars['String'];
+  oid: Scalars['Int'];
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -118,6 +128,7 @@ export type Query = {
   allImages?: Maybe<ImageConnection>;
   allRequests?: Maybe<RequestConnection>;
   allTasks?: Maybe<TaskConnection>;
+  largeObjects?: Maybe<Array<Maybe<LargeObject>>>;
   node?: Maybe<Node>;
 };
 
@@ -146,6 +157,11 @@ export type QueryAllTasksArgs = {
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<Array<InputMaybe<TaskSortEnum>>>;
+};
+
+
+export type QueryLargeObjectsArgs = {
+  oids?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 
@@ -292,21 +308,28 @@ export type AllRequestsQueryVariables = Exact<{
 }>;
 
 
-export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, kind: string, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typename?: 'RequestConnection', edges: Array<{ __typename?: 'RequestEdge', node?: { __typename?: 'Request', id: string, prompt: string, priority?: number | null, approved?: boolean | null, generated?: boolean | null, kind: string, createdOn?: any | null, updatedOn?: any | null, tasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, status: string, running?: boolean | null, error?: string | null } | null } | null> } | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllTasksQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<TaskSortEnum>> | InputMaybe<TaskSortEnum>>;
 }>;
 
 
-export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, kind: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null } | null } | null> } | null } | null } | null> } | null };
+export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, kind: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllImagesQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
 }>;
 
 
-export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null } | null } | null> } | null };
+export type AllImagesQuery = { __typename?: 'Query', allImages?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, taskId?: number | null, oid?: any | null } | null } | null> } | null };
+
+export type LargeObjectsQueryVariables = Exact<{
+  oids?: InputMaybe<Array<Scalars['Int']> | Scalars['Int']>;
+}>;
+
+
+export type LargeObjectsQuery = { __typename?: 'Query', largeObjects?: Array<{ __typename?: 'LargeObject', oid: number, data: string } | null> | null };
 
 export type CreateRequestMutationVariables = Exact<{
   prompt?: InputMaybe<Scalars['String']>;
@@ -353,6 +376,7 @@ export const AllRequestsDocument = gql`
             node {
               id
               filename
+              oid
             }
           }
         }
@@ -385,6 +409,7 @@ export const AllTasksDocument = gql`
             node {
               id
               filename
+              oid
             }
           }
         }
@@ -409,6 +434,7 @@ export const AllImagesDocument = gql`
         updatedOn
         requestId
         taskId
+        oid
       }
     }
   }
@@ -417,6 +443,18 @@ export const AllImagesDocument = gql`
 
 export function useAllImagesQuery(options?: Omit<Urql.UseQueryArgs<AllImagesQueryVariables>, 'query'>) {
   return Urql.useQuery<AllImagesQuery, AllImagesQueryVariables>({ query: AllImagesDocument, ...options });
+};
+export const LargeObjectsDocument = gql`
+    query LargeObjects($oids: [Int!]) {
+  largeObjects(oids: $oids) {
+    oid
+    data
+  }
+}
+    `;
+
+export function useLargeObjectsQuery(options?: Omit<Urql.UseQueryArgs<LargeObjectsQueryVariables>, 'query'>) {
+  return Urql.useQuery<LargeObjectsQuery, LargeObjectsQueryVariables>({ query: LargeObjectsDocument, ...options });
 };
 export const CreateRequestDocument = gql`
     mutation CreateRequest($prompt: String) {
