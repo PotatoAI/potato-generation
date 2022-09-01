@@ -33,12 +33,12 @@ class Worker:
                 task, request = get_top_task(self.task_kind)
                 task.worker_id = socket.gethostname()
                 task.running = True
+                log = f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
+                info(log)
+                task.log = f"{task.log}\n{log}"
                 commit()
 
                 try:
-                    log = f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
-                    info(log)
-                    task.log = f"{task.log}\n{log}"
 
                     result = gen.generate(
                         f"request/{request.id}",

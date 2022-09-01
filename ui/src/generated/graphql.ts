@@ -245,6 +245,7 @@ export type Task = Node & {
   id: Scalars['ID'];
   images?: Maybe<ImageConnection>;
   kind: Scalars['String'];
+  log?: Maybe<Scalars['String']>;
   priority?: Maybe<Scalars['Int']>;
   request?: Maybe<Request>;
   requestId?: Maybe<Scalars['Int']>;
@@ -289,6 +290,8 @@ export enum TaskSortEnum {
   IdDesc = 'ID_DESC',
   KindAsc = 'KIND_ASC',
   KindDesc = 'KIND_DESC',
+  LogAsc = 'LOG_ASC',
+  LogDesc = 'LOG_DESC',
   PriorityAsc = 'PRIORITY_ASC',
   PriorityDesc = 'PRIORITY_DESC',
   RequestIdAsc = 'REQUEST_ID_ASC',
@@ -315,7 +318,7 @@ export type AllTasksQueryVariables = Exact<{
 }>;
 
 
-export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, priority?: number | null, workerId: string, kind: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
+export type AllTasksQuery = { __typename?: 'Query', allTasks?: { __typename?: 'TaskConnection', edges: Array<{ __typename?: 'TaskEdge', node?: { __typename?: 'Task', id: string, running?: boolean | null, status: string, error?: string | null, log?: string | null, priority?: number | null, workerId: string, kind: string, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, images?: { __typename?: 'ImageConnection', edges: Array<{ __typename?: 'ImageEdge', node?: { __typename?: 'Image', id: string, filename?: string | null, oid?: any | null } | null } | null> } | null } | null } | null> } | null };
 
 export type AllImagesQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
@@ -398,6 +401,7 @@ export const AllTasksDocument = gql`
         running
         status
         error
+        log
         priority
         workerId
         kind
