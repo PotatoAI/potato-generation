@@ -34,6 +34,11 @@ def repl(args):
     IPython.embed()
 
 
+def wip(args):
+    w = diff.worker.SlideshowWorker()
+    w.generate()
+
+
 def server(args):
     import diff.server
     diff.server.run()
@@ -68,6 +73,7 @@ parser_repl = subparsers.add_parser('repl', help='Drop into REPL')
 parser_server = subparsers.add_parser('server', help='Run Flask server')
 parser_export_graphql_schema = subparsers.add_parser('export-graphql-schema',
                                                      help='Run Flask server')
+parser_wip = subparsers.add_parser('wip', help='Run Flask server')
 
 parser_request.add_argument('--prompt',
                             help='Prompt to schedule a task',
@@ -80,6 +86,7 @@ parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
 parser_server.set_defaults(func=server)
 parser_export_graphql_schema.set_defaults(func=export_graphql_schema)
+parser_wip.set_defaults(func=wip)
 
 args = parser.parse_args()
 

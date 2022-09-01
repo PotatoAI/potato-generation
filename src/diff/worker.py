@@ -68,3 +68,15 @@ class Worker:
                 info('Dry Run')
 
             commit()
+
+
+class SlideshowWorker:
+    def __init__(self, ):
+        self.something = 1
+
+    def run(self):
+        print('yeah, sure')
+
+    def generate(self):
+        id = 19
+        print(f"gen for {id}")

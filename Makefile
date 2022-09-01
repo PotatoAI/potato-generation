@@ -12,8 +12,11 @@ migrate: config.yaml
 repl: config.yaml
 	$(MAIN) repl
 
-server: .venv config.yaml
+server: config.yaml
 	$(MAIN) server
+
+wip: config.yaml
+	$(MAIN) wip
 
 ui/src/graphql/schema.schema: config.yaml
 	echo $(MAIN) export-graphql-schema
