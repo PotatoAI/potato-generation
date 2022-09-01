@@ -90,6 +90,7 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   const [selected, setSelected] = useState<Array<string>>([]);
   const [result, refresh] = useAllRequestsQuery({
     variables: { sort: RequestSortEnum.CreatedOnDesc },
+    requestPolicy: 'network-only',
   });
 
   const { data, fetching, error } = result;
@@ -167,6 +168,7 @@ const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   const [selected, setSelected] = useState<Array<string>>([]);
   const [result, refresh] = useAllTasksQuery({
     variables: { sort: TaskSortEnum.CreatedOnDesc },
+    requestPolicy: 'network-only',
   });
 
   const { data, fetching, error } = result;
@@ -233,6 +235,7 @@ const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   const [selected, setSelected] = useState<Array<string>>([]);
   const [result, refresh] = useAllImagesQuery({
     variables: { sort: ImageSortEnum.CreatedOnDesc },
+    requestPolicy: 'network-only',
   });
 
   const { data, fetching, error } = result;
