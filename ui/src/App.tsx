@@ -55,8 +55,6 @@ function a11yProps(index: number) {
   };
 }
 
-const loader = <LoadingModal loading={true} />;
-
 const RefreshButton = (props: {refresh: () => void}) => {
   return <IconButton onClick={props.refresh}><RefreshIcon /></IconButton>
 }
@@ -153,7 +151,8 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      {fetching ? loader : dataGrid}
+      <LoadingModal loading={fetching} />
+      {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button disabled={selected.length === 0} onClick={approveSelected} color="success">Approve</Button>
         <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
@@ -219,7 +218,8 @@ const TasksDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      {fetching ? loader : dataGrid}
+      <LoadingModal loading={fetching} />
+      {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
         <Button disabled={selected.length === 0} onClick={reRunSelected} color="warning">Re-Run</Button>
@@ -278,7 +278,8 @@ const ImagesDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
   return (
     <>
       <p>{error ? JSON.stringify(error) : ""}</p>
-      {fetching ? loader : dataGrid}
+      <LoadingModal loading={fetching} />
+      {dataGrid}
       <Portal container={props.portalRef.current}>
         <Button disabled={selected.length === 0} onClick={selectSelected} color="success">Select</Button>
         <Button disabled={selected.length === 0} onClick={deleteSelected} color="error">Delete</Button>
