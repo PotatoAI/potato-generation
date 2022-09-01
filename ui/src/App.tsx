@@ -150,8 +150,8 @@ const RequestsDataGrid = (props: {portalRef: MutableRefObject<null>}) => {
       <p>{error ? JSON.stringify(error) : ""}</p>
       {fetching ? loader : dataGrid}
       <Portal container={props.portalRef.current}>
-        <Button onClick={approveSelected}>Approve</Button>
-        <Button onClick={deleteSelected}>Delete</Button>
+        <Button disabled={selected.length === 0} onClick={approveSelected}>Approve</Button>
+        <Button disabled={selected.length === 0} onClick={deleteSelected}>Delete</Button>
       </Portal>
     </>
   );
