@@ -167,7 +167,7 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
       <DataGrid
         rows={rows}
         columns={columns}
-        pageSize={5}
+        pageSize={30}
         rowsPerPageOptions={[5]}
         checkboxSelection
         disableSelectionOnClick
