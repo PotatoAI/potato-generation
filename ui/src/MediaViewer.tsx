@@ -139,9 +139,12 @@ export const MediaViewer = (props: Props) => {
     <Box>
       {modalOpen && <MediaModal {...props} close={() => setModalOpen(false)} />}
       {oids.length > 0 && (
-        <IconButton onClick={() => setModalOpen(true)}>
-          <PlayCircleIcon />
-        </IconButton>
+        <>
+          {oids.length}
+          <IconButton onClick={() => setModalOpen(true)}>
+            <PlayCircleIcon />
+          </IconButton>
+        </>
       )}
     </Box>
   );
