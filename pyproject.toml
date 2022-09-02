@@ -5,7 +5,7 @@ description = ""
 authors = ["Max Gonzih <gonzih@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.12"
+python = ">=3.9,<3.12"
 diffusers = {git = "https://github.com/PotatoAI/diffusers.git", rev = "no-filter"}
 transformers = "^4.21.2"
 scipy = "^1.9.1"
