@@ -1,10 +1,11 @@
 import time
 import os
 import socket
+import uuid
 from typing import List
 from diff.config import GenConfig
 from diff.gen import Generator
-from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request
+from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
 from logging import info, error
 
 
@@ -124,3 +125,20 @@ class SlideshowWorker:
 
         os.system(command)
         save_video(out, req.id)
+
+    def add_audio(self, vid: List[int], metadata: List[str]):
+        vids = get_videos(vid)
+        audio_file = metadata[0]
+        folder = "output/videos"
+        os.makedirs(folder, exist_ok=True)
+        for vid in vids:
+            out = f"{folder}/{uuid.uuid1()}.mp4"
+            command = f"ffmpeg -i {vid.filename} -i {audio_file} -map 0:v -map 1:a -c:v copy -shortest {out}"
+            info(command)
+
+            with open(vid.filename, 'wb') as fb:
+                info(f"Writing {vid.filename}")
+                fb.write(read_binary_file(vid.oid))
+
+            os.system(command)
+            save_video(out, vid.request.id)

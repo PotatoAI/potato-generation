@@ -143,22 +143,42 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [actionResult, action] = useDoActionMutation();
 
   const approveSelected = async () => {
-    await action({ ids: selected, action: "approve", model: "request" });
+    await action({
+      ids: selected,
+      action: "approve",
+      model: "request",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const deleteSelected = async () => {
-    await action({ ids: selected, action: "delete", model: "request" });
+    await action({
+      ids: selected,
+      action: "delete",
+      model: "request",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const reRunSelected = async () => {
-    await action({ ids: selected, action: "re-run", model: "request" });
+    await action({
+      ids: selected,
+      action: "re-run",
+      model: "request",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const genVid = async () => {
-    await action({ ids: selected, action: "generate-video", model: "request" });
+    await action({
+      ids: selected,
+      action: "generate-video",
+      model: "request",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
@@ -261,12 +281,22 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [actionResult, action] = useDoActionMutation();
 
   const deleteSelected = async () => {
-    await action({ ids: selected, action: "delete", model: "task" });
+    await action({
+      ids: selected,
+      action: "delete",
+      model: "task",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const reRunSelected = async () => {
-    await action({ ids: selected, action: "re-run", model: "task" });
+    await action({
+      ids: selected,
+      action: "re-run",
+      model: "task",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
@@ -342,12 +372,22 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [actionResult, action] = useDoActionMutation();
 
   const selectSelected = async () => {
-    await action({ ids: selected, action: "select", model: "image" });
+    await action({
+      ids: selected,
+      action: "select",
+      model: "image",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const deleteSelected = async () => {
-    await action({ ids: selected, action: "delete", model: "image" });
+    await action({
+      ids: selected,
+      action: "delete",
+      model: "image",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
@@ -423,12 +463,22 @@ const VideosDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [actionResult, action] = useDoActionMutation();
 
   const selectSelected = async () => {
-    await action({ ids: selected, action: "select", model: "video" });
+    await action({
+      ids: selected,
+      action: "select",
+      model: "video",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 
   const deleteSelected = async () => {
-    await action({ ids: selected, action: "delete", model: "video" });
+    await action({
+      ids: selected,
+      action: "delete",
+      model: "video",
+      metadata: [],
+    });
     await refresh({ requestPolicy: "network-only" });
   };
 

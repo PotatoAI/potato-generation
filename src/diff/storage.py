@@ -183,7 +183,11 @@ def get_request(id: int) -> Request:
     return db_session.query(Request).filter(Request.id == id).one()
 
 
-def get_selected_images_for_request(rid: int) -> Request:
+def get_videos(ids: List[int]) -> List[Video]:
+    return db_session.query(Video).filter(Video.id.in_(ids)).all()
+
+
+def get_selected_images_for_request(rid: int) -> List[Image]:
     return db_session.query(Image).filter(
         Image.request_id == rid,
         Image.selected == True,

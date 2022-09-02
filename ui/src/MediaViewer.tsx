@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { useLargeObjectsQuery, useDoActionMutation } from "./generated/graphql";
+import {
+  useLargeObjectsQuery,
+  useDoActionMutation,
+  useInputFilesQuery,
+} from "./generated/graphql";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -32,15 +38,40 @@ type Props = {
 const ExtraControlsVideo = (props: { id: string }) => {
   const { id } = props;
   const [actionResult, action] = useDoActionMutation();
+  const [inputFiles, refreshInputFiles] = useInputFilesQuery();
+  const [selectedFile, setSelectedFile] = useState("");
 
   const select = async () => {
-    await action({ ids: [id], action: "add-audio", model: "video" });
+    await action({
+      ids: [id],
+      action: "add-audio",
+      model: "video",
+      metadata: [selectedFile],
+    });
   };
 
   const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
 
   return (
     <Box>
+      {inputFiles.fetching ? (
+        loader
+      ) : (
+        <Select
+          value={selectedFile}
+          onChange={(e) => setSelectedFile(e.target.value)}
+        >
+          {inputFiles?.data?.inputFiles?.map((f) => {
+            if (f) {
+              return (
+                <MenuItem value={f} key={f}>
+                  {f.slice(-25)}
+                </MenuItem>
+              );
+            }
+          })}
+        </Select>
+      )}
       <Button onClick={select}>
         {actionResult.fetching ? loader : "Add audio"}
       </Button>

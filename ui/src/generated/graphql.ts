@@ -102,6 +102,7 @@ export type MutationCreateRequestArgs = {
 export type MutationDoActionArgs = {
   action: Scalars['String'];
   ids?: InputMaybe<Array<Scalars['String']>>;
+  metadata?: InputMaybe<Array<Scalars['String']>>;
   model: Scalars['String'];
 };
 
@@ -130,6 +131,7 @@ export type Query = {
   allRequests?: Maybe<RequestConnection>;
   allTasks?: Maybe<TaskConnection>;
   allVideos?: Maybe<VideoConnection>;
+  inputFiles?: Maybe<Array<Maybe<Scalars['String']>>>;
   largeObjects?: Maybe<Array<Maybe<LargeObject>>>;
   node?: Maybe<Node>;
 };
@@ -421,10 +423,16 @@ export type DoActionMutationVariables = Exact<{
   ids?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
   action: Scalars['String'];
   model: Scalars['String'];
+  metadata?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 
 export type DoActionMutation = { __typename?: 'Mutation', doAction?: { __typename?: 'DoAction', ok?: boolean | null } | null };
+
+export type InputFilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InputFilesQuery = { __typename?: 'Query', inputFiles?: Array<string | null> | null };
 
 
 export const AllRequestsDocument = gql`
@@ -581,8 +589,8 @@ export function useCreateRequestMutation() {
   return Urql.useMutation<CreateRequestMutation, CreateRequestMutationVariables>(CreateRequestDocument);
 };
 export const DoActionDocument = gql`
-    mutation DoAction($ids: [String!], $action: String!, $model: String!) {
-  doAction(ids: $ids, action: $action, model: $model) {
+    mutation DoAction($ids: [String!], $action: String!, $model: String!, $metadata: [String!]) {
+  doAction(ids: $ids, action: $action, model: $model, metadata: $metadata) {
     ok
   }
 }
@@ -590,4 +598,13 @@ export const DoActionDocument = gql`
 
 export function useDoActionMutation() {
   return Urql.useMutation<DoActionMutation, DoActionMutationVariables>(DoActionDocument);
+};
+export const InputFilesDocument = gql`
+    query InputFiles {
+  inputFiles
+}
+    `;
+
+export function useInputFilesQuery(options?: Omit<Urql.UseQueryArgs<InputFilesQueryVariables>, 'query'>) {
+  return Urql.useQuery<InputFilesQuery, InputFilesQueryVariables>({ query: InputFilesDocument, ...options });
 };

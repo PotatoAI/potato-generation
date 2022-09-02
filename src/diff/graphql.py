@@ -1,4 +1,5 @@
 # flask_sqlalchemy/schema.py
+import glob
 import graphene
 import json
 import asyncio
@@ -72,6 +73,11 @@ class Query(graphene.ObjectType):
 
         return response
 
+    input_files = graphene.List(graphene.String)
+
+    def resolve_input_files(self, info):
+        return glob.glob('input/**/**/*')
+
     all_requests = SQLAlchemyConnectionField(Request.connection)
     all_tasks = SQLAlchemyConnectionField(Task.connection)
     all_images = SQLAlchemyConnectionField(Image.connection)
@@ -97,10 +103,11 @@ class DoAction(graphene.Mutation):
         ids = graphene.List(graphene.NonNull(graphene.String))
         action = graphene.NonNull(graphene.String)
         model = graphene.NonNull(graphene.String)
+        metadata = graphene.List(graphene.NonNull(graphene.String))
 
     ok = graphene.Boolean()
 
-    def mutate(root, info, ids, action, model):
+    def mutate(root, info, ids, action, model, metadata):
         ok = DoAction(ok=True)
 
         real_ids = list(map(real_id, ids))
@@ -114,6 +121,11 @@ class DoAction(graphene.Mutation):
         if action == 'generate-video' and model == 'request':
             worker = SlideshowWorker()
             worker.generate(real_ids)
+            return ok
+
+        if action == 'add-audio' and model == 'video':
+            worker = SlideshowWorker()
+            worker.add_audio(real_ids, metadata)
             return ok
 
         if action == 'delete':

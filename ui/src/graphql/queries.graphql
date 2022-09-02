@@ -122,8 +122,12 @@ mutation CreateRequest($prompt: String, $count: Int) {
   }
 }
 
-mutation DoAction($ids: [String!], $action: String!, $model: String!) {
-  doAction(ids: $ids, action: $action, model: $model) {
+mutation DoAction($ids: [String!], $action: String!, $model: String!, $metadata: [String!]) {
+  doAction(ids: $ids, action: $action, model: $model, metadata: $metadata) {
     ok
   }
+}
+
+query InputFiles {
+  inputFiles
 }
