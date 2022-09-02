@@ -112,19 +112,19 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     {
       field: "images",
       renderCell: (p) => {
-        const oids = p.row.images.edges.map(
-          (i: { node: { oid: number } }) => i.node.oid
+        const data = p.row.images.edges.map(
+          (i: { node: { oid: number; id: number } }) => i.node
         );
-        return <MediaViewer oids={oids} kind="image" />;
+        return <MediaViewer mediaData={data} kind="image" />;
       },
     },
     {
       field: "videos",
       renderCell: (p) => {
-        const oids = p.row.videos.edges.map(
-          (i: { node: { oid: number } }) => i.node.oid
+        const data = p.row.videos.edges.map(
+          (i: { node: { oid: number; id: number } }) => i.node
         );
-        return <MediaViewer oids={oids} kind="video" />;
+        return <MediaViewer mediaData={data} kind="video" />;
       },
     },
     { field: "approved", width: 90 },
@@ -245,10 +245,10 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     {
       field: "images",
       renderCell: (p) => {
-        const oids = p.row.images.edges.map(
-          (i: { node: { oid: number } }) => i.node.oid
+        const data = p.row.images.edges.map(
+          (i: { node: { oid: number; id: string } }) => i.node
         );
-        return <MediaViewer oids={oids} kind="image" />;
+        return <MediaViewer mediaData={data} kind="image" />;
       },
     },
     { field: "createdOn", width: dateColW },
@@ -326,7 +326,7 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     {
       field: "oid",
       renderCell: (p) => {
-        return <MediaViewer oids={[p.row.oid]} kind="image" />;
+        return <MediaViewer mediaData={[p.row]} kind="image" />;
       },
     },
     { field: "filename" },
@@ -407,7 +407,7 @@ const VideosDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     {
       field: "oid",
       renderCell: (p) => {
-        return <MediaViewer oids={[p.row.oid]} kind="video" />;
+        return <MediaViewer mediaData={[p.row]} kind="video" />;
       },
     },
     { field: "filename" },

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useLargeObjectsQuery } from "./generated/graphql";
+import { useLargeObjectsQuery, useDoActionMutation } from "./generated/graphql";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
@@ -18,8 +19,13 @@ const style = {
   transform: "translate(-50%, -50%)",
 };
 
+interface MediaData {
+  id: string;
+  oid: number;
+}
+
 type Props = {
-  oids: Array<number>;
+  mediaData: Array<MediaData>;
   kind: "video" | "image";
 };
 
@@ -28,12 +34,15 @@ type ModalProps = {
 };
 
 const MediaModal = (props: Props & ModalProps) => {
-  const { oids, kind, close } = props;
+  const { mediaData, kind, close } = props;
+  const oids = mediaData.map((r) => r.oid);
+  const ids = mediaData.map((r) => r.id);
   const [focused, setFocused] = useState(0);
-  const current = oids[focused];
+  const currentId = ids[focused];
+  const currentOid = oids[focused];
 
   const [result, refresh] = useLargeObjectsQuery({
-    variables: { oids: [current] },
+    variables: { oids: [currentOid] },
     /* requestPolicy: "network-only", */
   });
 
@@ -61,14 +70,22 @@ const MediaModal = (props: Props & ModalProps) => {
     });
   };
 
+  const [actionResult, action] = useDoActionMutation();
+
+  const deleteCurrent = async () => {
+    await action({ ids: [currentId], action: "delete", model: kind });
+    next();
+    /* await refresh({ requestPolicy: "network-only" }); */
+  };
+
   let prefix = "data:image/png;base64,";
-  const mediaData = allData[0];
-  const src = `${prefix}${mediaData}`;
+  const base64Data = allData[0];
+  const src = `${prefix}${base64Data}`;
   let el = <img width={512} height={512} src={src} />;
 
   if (kind === "video") {
     prefix = "data:video/mp4;base64,";
-    const src = `${prefix}${mediaData}`;
+    const src = `${prefix}${base64Data}`;
     el = (
       <video controls autoPlay>
         <source type="video/mp4" src={src} />
@@ -103,6 +120,11 @@ const MediaModal = (props: Props & ModalProps) => {
         </Box>
       )}
       {error && JSON.stringify(error)}
+      <Box sx={{ justifyContent: "space-evenly", display: "flex" }}>
+        <Button color="error" onClick={deleteCurrent}>
+          Delete
+        </Button>
+      </Box>
       <Box sx={{ justifyContent: "space-between", display: "flex" }}>
         <IconButton onClick={prev}>
           <ArrowBackIosIcon />
@@ -132,15 +154,15 @@ const MediaModal = (props: Props & ModalProps) => {
 };
 
 export const MediaViewer = (props: Props) => {
-  const { oids, kind } = props;
+  const { mediaData, kind } = props;
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Box>
       {modalOpen && <MediaModal {...props} close={() => setModalOpen(false)} />}
-      {oids.length > 0 && (
+      {mediaData.length > 0 && (
         <>
-          {oids.length}
+          {mediaData.length}
           <IconButton onClick={() => setModalOpen(true)}>
             <PlayCircleIcon />
           </IconButton>
