@@ -84,7 +84,7 @@ const ExtraControlsImage = (props: { id: string }) => {
   const [actionResult, action] = useDoActionMutation();
 
   const select = async () => {
-    await action({ ids: [id], action: "select", model: "image" });
+    await action({ ids: [id], action: "select", model: "image", metadata: [] });
   };
 
   const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
@@ -142,7 +142,12 @@ const MediaModal = (props: Props & ModalProps) => {
   const [actionResult, action] = useDoActionMutation();
 
   const deleteCurrent = async () => {
-    await action({ ids: [currentId], action: "delete", model: kind });
+    await action({
+      ids: [currentId],
+      action: "delete",
+      model: kind,
+      metadata: [],
+    });
     next();
     /* await refresh({ requestPolicy: "network-only" }); */
   };
