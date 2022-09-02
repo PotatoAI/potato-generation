@@ -29,6 +29,25 @@ type Props = {
   kind: "video" | "image";
 };
 
+const ExtraControlsVideo = (props: { id: string }) => {
+  const { id } = props;
+  const [actionResult, action] = useDoActionMutation();
+
+  const select = async () => {
+    await action({ ids: [id], action: "add-audio", model: "video" });
+  };
+
+  const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
+
+  return (
+    <Box>
+      <Button onClick={select}>
+        {actionResult.fetching ? loader : "Add audio"}
+      </Button>
+    </Box>
+  );
+};
+
 const ExtraControlsImage = (props: { id: string }) => {
   const { id } = props;
   const [actionResult, action] = useDoActionMutation();
@@ -41,7 +60,7 @@ const ExtraControlsImage = (props: { id: string }) => {
 
   return (
     <Box>
-      <Button onClick={select}>
+      <Button color="success" onClick={select}>
         {actionResult.fetching ? loader : "Select"}
       </Button>
     </Box>
@@ -121,6 +140,9 @@ const MediaModal = (props: Props & ModalProps) => {
   );
 
   let extraControls = <ExtraControlsImage id={currentId} />;
+  if (kind === "video") {
+    extraControls = <ExtraControlsVideo id={currentId} />;
+  }
 
   const modalContent = (
     <Box>

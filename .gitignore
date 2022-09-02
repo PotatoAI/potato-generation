@@ -4,3 +4,4 @@ output/*
 config.yaml
 codegen/schema.json
 .log
+input
