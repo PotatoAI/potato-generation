@@ -64,8 +64,7 @@ class Query(graphene.ObjectType):
         response = []
         for oid in oids:
             bdata = read_binary_file(oid)
-            b64data = base64.b64encode(bdata).decode('ascii')
-            data = f"data:image/png;base64, {b64data}"
+            data = base64.b64encode(bdata).decode('ascii')
             response.append(LargeObject(
                 oid=oid,
                 data=data,
