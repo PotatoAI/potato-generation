@@ -4,7 +4,7 @@ import socket
 from typing import List
 from diff.config import GenConfig
 from diff.gen import Generator
-from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video
+from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request
 from logging import info, error
 
 
@@ -87,7 +87,8 @@ class SlideshowWorker:
         print(f"gen for {id}")
         req = get_request(id)
         print(req)
-        cnt = len(req.images)
+        images = get_selected_images_for_request(req.id)
+        cnt = len(images)
         print(cnt)
         folder = "output/videos"
         img_folder = "output/tmp"
@@ -115,7 +116,7 @@ class SlideshowWorker:
         command = f"ffmpeg{d}-y{d}{loop_section}{d}-filter_complex{d}\"{filter_section}{d}{overlay_section}\"{d}-r 25{d}-map \"[v]\"{d}{out}"
         info(f"Command:\n{command}")
 
-        for i, f in enumerate(req.images):
+        for i, f in enumerate(images):
             fname = f"{img_folder}/{i}.png"
             with open(fname, 'wb') as fb:
                 info(f"Writing {fname}")

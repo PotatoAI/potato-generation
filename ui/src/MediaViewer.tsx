@@ -29,6 +29,25 @@ type Props = {
   kind: "video" | "image";
 };
 
+const ExtraControlsImage = (props: { id: string }) => {
+  const { id } = props;
+  const [actionResult, action] = useDoActionMutation();
+
+  const select = async () => {
+    await action({ ids: [id], action: "select", model: "image" });
+  };
+
+  const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
+
+  return (
+    <Box>
+      <Button onClick={select}>
+        {actionResult.fetching ? loader : "Select"}
+      </Button>
+    </Box>
+  );
+};
+
 type ModalProps = {
   close: () => void;
 };
@@ -101,6 +120,8 @@ const MediaModal = (props: Props & ModalProps) => {
     </Box>
   );
 
+  let extraControls = <ExtraControlsImage id={currentId} />;
+
   const modalContent = (
     <Box>
       {!fetching ? (
@@ -121,6 +142,7 @@ const MediaModal = (props: Props & ModalProps) => {
       )}
       {error && JSON.stringify(error)}
       <Box sx={{ justifyContent: "space-evenly", display: "flex" }}>
+        {extraControls}
         <Button color="error" onClick={deleteCurrent}>
           Delete
         </Button>

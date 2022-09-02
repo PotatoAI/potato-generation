@@ -57,10 +57,12 @@ def schedule_request(rid: int, priority: int = 0, kind: str = "diffusion"):
     info(f"Scheduled new task {task.id}")
 
 
-def add_new_request(prompt: str,
-                    count: int = 1,
-                    kind: str = "diffusion",
-                    priority=0):
+def add_new_request(
+    prompt: str,
+    count: int = 1,
+    kind: str = "diffusion",
+    priority=0,
+):
     if not prompt:
         prompt = input("Enter prompt: ")
 
@@ -135,10 +137,13 @@ def delete_videos(ids: List[int]):
 
 def query_top_tasks(kind: str):
     return db_session.query(Task, Request).filter(
-        Task.request_id == Request.id, Task.running == False,
-        Task.status == 'new', Request.approved == True, Request.kind == kind,
-        Task.kind == kind).order_by(desc(Task.priority)).order_by(
-            Task.created_on)
+        Task.request_id == Request.id,
+        Task.running == False,
+        Task.status == 'new',
+        Request.approved == True,
+        Request.kind == kind,
+        Task.kind == kind,
+    ).order_by(desc(Task.priority)).order_by(Task.created_on)
 
 
 def has_top_task(kind: str) -> int:
@@ -176,3 +181,10 @@ def save_video(fname: str, rid: int):
 
 def get_request(id: int) -> Request:
     return db_session.query(Request).filter(Request.id == id).one()
+
+
+def get_selected_images_for_request(rid: int) -> Request:
+    return db_session.query(Image).filter(
+        Image.request_id == rid,
+        Image.selected == True,
+    ).all()
