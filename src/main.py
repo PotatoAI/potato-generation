@@ -94,5 +94,6 @@ info(args)
 config = diff.config.read(args.config)
 info(config)
 diff.storage.init_db_session(config.db)
+login(config.hf.token)
 
 args.func(args)
