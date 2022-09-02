@@ -110,14 +110,26 @@ def delete_tasks(ids: List[int]):
 
 
 def delete_images(ids: List[int]):
-    images = db_session.query(Image).filter(Image.id.in_(ids)).all()
-    for img in images:
+    records = db_session.query(Image).filter(Image.id.in_(ids)).all()
+    for rec in records:
         try:
-            delete_binary_file(img.oid)
+            delete_binary_file(rec.oid)
         except Exception as e:
             error(e)
         finally:
-            db_session.delete(img)
+            db_session.delete(rec)
+    db_session.commit()
+
+
+def delete_videos(ids: List[int]):
+    records = db_session.query(Video).filter(Video.id.in_(ids)).all()
+    for rec in records:
+        try:
+            delete_binary_file(rec.oid)
+        except Exception as e:
+            error(e)
+        finally:
+            db_session.delete(rec)
     db_session.commit()
 
 

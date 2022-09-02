@@ -11,7 +11,7 @@ from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel, Video as VideoModel
 from diff.worker import SlideshowWorker
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, schedule_request, reschedule_tasks, select_images, read_binary_file
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file
 from base64 import b64decode
 from typing import List
 
@@ -64,7 +64,8 @@ class Query(graphene.ObjectType):
         response = []
         for oid in oids:
             bdata = read_binary_file(oid)
-            data = base64.b64encode(bdata).decode('ascii')
+            b64data = base64.b64encode(bdata).decode('ascii')
+            data = f"data:image/png;base64, {b64data}"
             response.append(LargeObject(
                 oid=oid,
                 data=data,
@@ -125,6 +126,9 @@ class DoAction(graphene.Mutation):
                 return ok
             if model == 'image':
                 delete_images(real_ids)
+                return ok
+            if model == 'video':
+                delete_videos(real_ids)
                 return ok
 
         if action == 're-run':
