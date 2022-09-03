@@ -10,7 +10,7 @@ import {
   ImageSortEnum,
   VideoSortEnum,
 } from "./generated/graphql";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowId } from "@mui/x-data-grid";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -30,6 +30,29 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+}
+
+function MyDataGrid<T>(props: {
+  rows: Array<T>;
+  columns: GridColDef[];
+  onSelectionModelChange: (ids: GridRowId[]) => void;
+}) {
+  const gridSX = { height: "calc(100vh - 70px)", width: "100%" };
+  const { rows, columns, onSelectionModelChange } = props;
+
+  return (
+    <Box sx={gridSX}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={30}
+        rowsPerPageOptions={[5]}
+        checkboxSelection
+        disableSelectionOnClick
+        onSelectionModelChange={onSelectionModelChange}
+      />
+    </Box>
+  );
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -92,7 +115,6 @@ const AppTabs = (props: {
 };
 
 const dateColW = 150;
-const gridSX = { height: "calc(100vh - 70px)", width: "100%" };
 
 const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [selected, setSelected] = useState<Array<string>>([]);
@@ -183,17 +205,11 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   };
 
   const dataGrid = (
-    <Box sx={gridSX}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={30}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-        disableSelectionOnClick
-        onSelectionModelChange={(ids) => setSelected(ids as string[])}
-      />
-    </Box>
+    <MyDataGrid
+      rows={rows}
+      columns={columns}
+      onSelectionModelChange={(ids) => setSelected(ids as string[])}
+    />
   );
 
   return (
@@ -301,17 +317,11 @@ const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   };
 
   const dataGrid = (
-    <Box sx={gridSX}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={30}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-        disableSelectionOnClick
-        onSelectionModelChange={(ids) => setSelected(ids as string[])}
-      />
-    </Box>
+    <MyDataGrid
+      rows={rows}
+      columns={columns}
+      onSelectionModelChange={(ids) => setSelected(ids as string[])}
+    />
   );
 
   return (
@@ -392,17 +402,11 @@ const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   };
 
   const dataGrid = (
-    <Box sx={gridSX}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={30}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-        disableSelectionOnClick
-        onSelectionModelChange={(ids) => setSelected(ids as string[])}
-      />
-    </Box>
+    <MyDataGrid
+      rows={rows}
+      columns={columns}
+      onSelectionModelChange={(ids) => setSelected(ids as string[])}
+    />
   );
 
   return (
@@ -483,17 +487,11 @@ const VideosDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   };
 
   const dataGrid = (
-    <Box sx={gridSX}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={30}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-        disableSelectionOnClick
-        onSelectionModelChange={(ids) => setSelected(ids as string[])}
-      />
-    </Box>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      onSelectionModelChange={(ids) => setSelected(ids as string[])}
+    />
   );
 
   return (
