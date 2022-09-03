@@ -144,8 +144,12 @@ class DoAction(graphene.Mutation):
 
         if action == 're-run':
             if model == 'request':
-                for rid in real_ids:
-                    schedule_request(rid)
+                count = 1
+                if len(metadata) > 0 and metadata[0]:
+                    count = int(metadata[0])
+                for _ in range(count):
+                    for rid in real_ids:
+                        schedule_request(rid)
                 return ok
             if model == 'task':
                 reschedule_tasks(real_ids)

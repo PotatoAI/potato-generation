@@ -185,11 +185,12 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   };
 
   const reRunSelected = async () => {
+    const count = prompt("How many times?") ?? "1";
     await action({
       ids: selected,
       action: "re-run",
       model: "request",
-      metadata: [],
+      metadata: [count],
     });
     await refresh({ requestPolicy: "network-only" });
   };
