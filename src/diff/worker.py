@@ -32,6 +32,7 @@ class Worker:
 
             if avaliable_tasks == 0:
                 if self.until_done:
+                    info("Queue is empty, exiting worker")
                     return
                 info('Waiting in a loop')
                 time.sleep(10)
