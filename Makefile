@@ -6,6 +6,9 @@ request: config.yaml
 worker: config.yaml
 	$(MAIN) worker
 
+worker-until-done: config.yaml
+	$(MAIN) worker --until-done
+
 migrate: config.yaml
 	$(MAIN) migrate
 
