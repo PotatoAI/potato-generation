@@ -15,11 +15,13 @@ class Worker:
         output_dir: str,
         gen_config: GenConfig,
         dry_run=False,
+        until_done=False,
     ):
         self.task_kind = "diffusion"
-        self.dry_run = dry_run
         self.output_dir = output_dir
         self.config = gen_config
+        self.dry_run = dry_run
+        self.until_done = until_done
 
     def run(self):
         gen = Generator()
@@ -29,6 +31,8 @@ class Worker:
             info(f"{avaliable_tasks} Tasks in queue")
 
             if avaliable_tasks == 0:
+                if self.until_done:
+                    return
                 info('Waiting in a loop')
                 time.sleep(10)
 

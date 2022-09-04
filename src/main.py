@@ -17,7 +17,8 @@ config: Config
 
 
 def worker(args):
-    worker = Worker(args.output_folder, config.gen, args.dry_run)
+    worker = Worker(args.output_folder, config.gen, args.dry_run,
+                    args.until_done)
     worker.run()
 
 
@@ -74,6 +75,11 @@ parser_server = subparsers.add_parser('server', help='Run Flask server')
 parser_export_graphql_schema = subparsers.add_parser('export-graphql-schema',
                                                      help='Run Flask server')
 parser_wip = subparsers.add_parser('wip', help='Run Flask server')
+
+parser_worker.add_argument(
+    '--until-done',
+    help='Run worker until all jobs are processed, then exit',
+    action=argparse.BooleanOptionalAction)
 
 parser_request.add_argument('--prompt',
                             help='Prompt to schedule a task',
