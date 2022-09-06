@@ -8,3 +8,5 @@ gen:
   inference_steps: 100
   batch_size: 1
   batch_count: 1
+video:
+  frames_per_pic: 4

@@ -23,10 +23,15 @@ class GenConfig(BaseModel):
     inference_steps: int
 
 
+class VideoConfig(BaseModel):
+    frames_per_pic: int
+
+
 class Config(BaseModel):
     hf: HuggingConfig
     db: DBConfig
     gen: GenConfig
+    video: VideoConfig
 
 
 def read(fname) -> Config:

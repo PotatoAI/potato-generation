@@ -3,7 +3,7 @@ import os
 import socket
 import uuid
 from typing import List
-from diff.config import GenConfig
+from diff.config import GenConfig, VideoConfig
 from diff.gen import Generator
 from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
 from logging import info, error
@@ -79,8 +79,8 @@ class Worker:
 
 
 class SlideshowWorker:
-    def __init__(self, ):
-        self.something = 1
+    def __init__(self):
+        self.frames_per_pic = 4
 
     def run(self):
         print('yeah, sure')
@@ -110,7 +110,7 @@ class SlideshowWorker:
         filter_section = d.join(
             map(
                 lambda i:
-                f"[{i+1}]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+{(i+1)*2}/TB[f{i}];",
+                f"[{i+1}]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+{(i+1)*self.frames_per_pic}/TB[f{i}];",
                 range(cnt - 2)))
 
         overlay_subsection = d.join(
