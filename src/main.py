@@ -8,9 +8,9 @@ from diff.config import config
 
 import argparse
 import coloredlogs
-from logging import info
+from logging import info, debug
 
-coloredlogs.install(level='DEBUG')
+coloredlogs.install(level='INFO')
 
 def worker(args):
     worker = Worker(args.output_folder, config().gen, args.dry_run,
@@ -52,6 +52,9 @@ parser.add_argument('--config',
                     help='Config file path',
                     nargs='?',
                     default='config.yaml')
+parser.add_argument('--verbose',
+                    help='Verbose output',
+                    action=argparse.BooleanOptionalAction)
 parser.add_argument(
     '--dry-run',
     help='Simulate generation without actually genarting anything',
@@ -92,9 +95,12 @@ parser_wip.set_defaults(func=wip)
 
 args = parser.parse_args()
 
-info(args)
+if args.verbose:
+    coloredlogs.install(level='DEBUG')
+
+debug(args)
 diff.config.init_config(args.config)
-info(config())
+debug(config())
 diff.storage.init_db_session(config().db)
 login(config().hf.token)
 
