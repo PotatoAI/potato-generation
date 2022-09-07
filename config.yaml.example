@@ -9,4 +9,4 @@ gen:
   batch_size: 1
   batch_count: 1
 video:
-  frames_per_pic: 4
+  frames_per_pic: 3

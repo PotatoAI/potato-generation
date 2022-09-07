@@ -92,7 +92,7 @@ class CreateRequest(graphene.Mutation):
     ok = graphene.Boolean()
     request = graphene.Field(lambda: Request)
 
-    def mutate(root, info, prompt, count):
+    def mutate(self, info, prompt, count):
         request = add_new_request(prompt, count=count)
         ok = True
         return CreateRequest(request=request, ok=ok)
@@ -107,7 +107,7 @@ class DoAction(graphene.Mutation):
 
     ok = graphene.Boolean()
 
-    def mutate(root, info, ids, action, model, metadata):
+    def mutate(self, info, ids, action, model, metadata):
         ok = DoAction(ok=True)
 
         real_ids = list(map(real_id, ids))

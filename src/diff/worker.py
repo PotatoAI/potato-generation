@@ -80,7 +80,7 @@ class Worker:
 
 class SlideshowWorker:
     def __init__(self):
-        self.frames_per_pic = 4
+        self.frames_per_pic = 3
 
     def run(self):
         print('yeah, sure')
