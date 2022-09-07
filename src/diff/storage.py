@@ -36,6 +36,7 @@ def delete_binary_file(oid: int) -> bytearray:
 
 
 def init_db_session(cfg: DBConfig):
+    info("Initializing db session")
     global db_engine
     db_engine = diff.db.connect(cfg)
     global db_session

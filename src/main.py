@@ -1,11 +1,10 @@
 import diff.db
-import diff.config
 import diff.schema
 import diff.graphql
 from diff.login import login
 from diff.worker import Worker
 from diff.storage import add_new_request
-from diff.config import Config
+from diff.config import config
 
 import argparse
 import coloredlogs
@@ -13,11 +12,8 @@ from logging import info
 
 coloredlogs.install(level='DEBUG')
 
-config: Config
-
-
 def worker(args):
-    worker = Worker(args.output_folder, config.gen, args.dry_run,
+    worker = Worker(args.output_folder, config().gen, args.dry_run,
                     args.until_done)
     worker.run()
 
@@ -27,7 +23,7 @@ def request(args):
 
 
 def migrate(args):
-    diff.db.migrate(config.db)
+    diff.db.migrate(config().db)
 
 
 def repl(args):
@@ -36,7 +32,7 @@ def repl(args):
 
 
 def wip(args):
-    w = diff.worker.SlideshowWorker()
+    w = diff.worker.SlideshowWorker(config())
     w.generate()
 
 
@@ -97,9 +93,9 @@ parser_wip.set_defaults(func=wip)
 args = parser.parse_args()
 
 info(args)
-config = diff.config.read(args.config)
-info(config)
-diff.storage.init_db_session(config.db)
-login(config.hf.token)
+diff.config.init_config(args.config)
+info(config())
+diff.storage.init_db_session(config().db)
+login(config().hf.token)
 
 args.func(args)

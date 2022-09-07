@@ -79,8 +79,8 @@ class Worker:
 
 
 class SlideshowWorker:
-    def __init__(self):
-        self.frames_per_pic = 3
+    def __init__(self, config: VideoConfig):
+        self.config = config
 
     def run(self):
         print('yeah, sure')
@@ -107,10 +107,12 @@ class SlideshowWorker:
         loop_section = d.join(
             map(lambda i: f"-loop 1 -t 3 -i {img_folder}/{i}.png", range(cnt)))
 
+        fpp = self.config.frames_per_pic
+
         filter_section = d.join(
             map(
                 lambda i:
-                f"[{i+1}]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+{(i+1)*self.frames_per_pic}/TB[f{i}];",
+                f"[{i+1}]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+{(i+1)*fpp}/TB[f{i}];",
                 range(cnt - 2)))
 
         overlay_subsection = d.join(

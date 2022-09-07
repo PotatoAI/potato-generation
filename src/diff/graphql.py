@@ -13,6 +13,7 @@ from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel, Video as VideoModel
 from diff.worker import SlideshowWorker
 from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file
+from diff.config import config
 from base64 import b64decode
 from typing import List
 
@@ -119,12 +120,12 @@ class DoAction(graphene.Mutation):
             return ok
 
         if action == 'generate-video' and model == 'request':
-            worker = SlideshowWorker()
+            worker = SlideshowWorker(config().video)
             worker.generate(real_ids)
             return ok
 
         if action == 'add-audio' and model == 'video':
-            worker = SlideshowWorker()
+            worker = SlideshowWorker(config().video)
             worker.add_audio(real_ids, metadata)
             return ok
 

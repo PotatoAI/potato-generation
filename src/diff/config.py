@@ -1,4 +1,5 @@
 import yaml
+from logging import info
 from pydantic import BaseModel
 from typing import Optional
 
@@ -33,7 +34,17 @@ class Config(BaseModel):
     gen: GenConfig
     video: VideoConfig
 
+global_config: Config
 
-def read(fname) -> Config:
+def init_config(fname: str):
+    info(f"Reading config from {fname}")
+    global global_config
+    global_config = read(fname)
+
+def config() -> Config:
+    global global_config
+    return global_config
+
+def read(fname: str) -> Config:
     with open(fname, 'r') as stream:
         return Config(**yaml.safe_load(stream))
