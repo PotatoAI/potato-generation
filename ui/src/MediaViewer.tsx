@@ -150,7 +150,7 @@ const MediaModal = (props: Props & ModalProps) => {
   if (kind === "video") {
     const src = `${prefix}/video/${currentId}`;
     el = (
-      <video controls autoPlay>
+      <video controls autoPlay key={src}>
         <source type="video/mp4" src={src} />
       </video>
     );
