@@ -109,15 +109,7 @@ const MediaModal = (props: Props & ModalProps) => {
   const [focused, setFocused] = useState(0);
   const currentId = ids[focused];
   const currentOid = oids[focused];
-
-  const [result, refresh] = useLargeObjectsQuery({
-    variables: { oids: [currentOid] },
-    /* requestPolicy: "network-only", */
-  });
-
-  const { fetching, data, error } = result;
-
-  const allData = result.data?.largeObjects?.map((lo) => lo?.data) || [];
+  const prefix = "http://localhost:5000";
 
   const prev = () => {
     setFocused((focused) => {
@@ -152,14 +144,11 @@ const MediaModal = (props: Props & ModalProps) => {
     /* await refresh({ requestPolicy: "network-only" }); */
   };
 
-  let prefix = "data:image/png;base64,";
-  const base64Data = allData[0];
-  const src = `${prefix}${base64Data}`;
+  const src = `${prefix}/image/${currentId}`;
   let el = <img width={512} height={512} src={src} />;
 
   if (kind === "video") {
-    prefix = "data:video/mp4;base64,";
-    const src = `${prefix}${base64Data}`;
+    const src = `${prefix}/video/${currentId}`;
     el = (
       <video controls autoPlay>
         <source type="video/mp4" src={src} />
@@ -182,23 +171,7 @@ const MediaModal = (props: Props & ModalProps) => {
 
   const modalContent = (
     <Box>
-      {!fetching ? (
-        el
-      ) : (
-        <Box
-          width="512px"
-          height="512px"
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            verticalAlign: "middle",
-            padding: "auto",
-          }}
-        >
-          {loader}
-        </Box>
-      )}
-      {error && JSON.stringify(error)}
+      {el}
       <Box sx={{ justifyContent: "space-evenly", display: "flex" }}>
         {extraControls}
         <Button color="error" onClick={deleteCurrent}>

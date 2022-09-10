@@ -193,3 +193,13 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
         Image.request_id == rid,
         Image.selected == True,
     ).all()
+
+
+def get_image_data(id: int) -> bytearray:
+    image =  db_session.query(Image).filter(Image.id == id).one()
+    return read_binary_file(image.oid)
+
+
+def get_video_data(id: int) -> bytearray:
+    video =  db_session.query(Video).filter(Video.id == id).one()
+    return read_binary_file(video.oid)
