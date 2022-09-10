@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  useLargeObjectsQuery,
-  useDoActionMutation,
-  useInputFilesQuery,
-} from "./generated/graphql";
+import { useDoActionMutation, useInputFilesQuery } from "./generated/graphql";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -108,7 +104,6 @@ const MediaModal = (props: Props & ModalProps) => {
   const ids = mediaData.map((r) => r.id);
   const [focused, setFocused] = useState(0);
   const currentId = ids[focused];
-  const currentOid = oids[focused];
   const prefix = "http://localhost:5000";
 
   const prev = () => {
@@ -145,7 +140,7 @@ const MediaModal = (props: Props & ModalProps) => {
   };
 
   const src = `${prefix}/image/${currentId}`;
-  let el = <img width={512} height={512} src={src} />;
+  let el = <img alt="img" width={512} height={512} src={src} />;
 
   if (kind === "video") {
     const src = `${prefix}/video/${currentId}`;
@@ -157,12 +152,6 @@ const MediaModal = (props: Props & ModalProps) => {
   }
 
   const label = `${focused + 1} / ${oids.length}`;
-
-  const loader = (
-    <Box sx={{ margin: "auto" }}>
-      <ChaoticOrbit size={25} speed={1.5} color="white" />
-    </Box>
-  );
 
   let extraControls = <ExtraControlsImage id={currentId} />;
   if (kind === "video") {
