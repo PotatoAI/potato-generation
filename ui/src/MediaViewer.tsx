@@ -34,7 +34,9 @@ type Props = {
 const ExtraControlsVideo = (props: { id: string }) => {
   const { id } = props;
   const [actionResult, action] = useDoActionMutation();
-  const [inputFiles, refreshInputFiles] = useInputFilesQuery();
+  const [inputFiles, refreshInputFiles] = useInputFilesQuery({
+    requestPolicy: "network-only",
+  });
   const [selectedFile, setSelectedFile] = useState("");
 
   const select = async () => {

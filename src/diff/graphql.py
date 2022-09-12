@@ -12,7 +12,7 @@ from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel, Video as VideoModel
 from diff.worker import SlideshowWorker
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file, get_request
 from diff.config import config
 from base64 import b64decode
 from typing import List
@@ -77,7 +77,7 @@ class Query(graphene.ObjectType):
     input_files = graphene.List(graphene.String)
 
     def resolve_input_files(self, info):
-        return glob.glob('input/**/**/*')
+        return glob.glob('input/**/*')
 
     all_requests = SQLAlchemyConnectionField(Request.connection)
     all_tasks = SQLAlchemyConnectionField(Task.connection)
@@ -142,6 +142,15 @@ class DoAction(graphene.Mutation):
             if model == 'video':
                 delete_videos(real_ids)
                 return ok
+
+        if action == 'copy' and model == 'request':
+            for rid in real_ids:
+                request = get_request(rid)
+                count = 5
+                if len(metadata) > 0 and metadata[0]:
+                    count = int(metadata[0])
+                add_new_request(request.prompt, count=count)
+
 
         if action == 're-run':
             if model == 'request':

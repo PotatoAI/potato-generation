@@ -195,6 +195,17 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     await refresh({ requestPolicy: "network-only" });
   };
 
+  const copySelected = async () => {
+    const count = prompt("How many times?") ?? "5";
+    await action({
+      ids: selected,
+      action: "copy",
+      model: "request",
+      metadata: [count],
+    });
+    await refresh({ requestPolicy: "network-only" });
+  };
+
   const genVid = async () => {
     await action({
       ids: selected,
@@ -246,6 +257,13 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
           color="warning"
         >
           Re-Run
+        </Button>
+        <Button
+          disabled={selected.length === 0}
+          onClick={copySelected}
+          color="warning"
+        >
+          Copy
         </Button>
         <RefreshButton
           refresh={() => refresh({ requestPolicy: "network-only" })}
