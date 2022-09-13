@@ -24,8 +24,8 @@ class Worker:
         self.config = gen_config
         self.dry_run = dry_run
         self.until_done = until_done
-        self.generator =  Generator() if self.task_kind == 'diffusion' else  None
-        self.upscaler =  Upscaler() if self.task_kind == 'upscale' else  None
+        self.generator = Generator() if self.task_kind == 'diffusion' else None
+        self.upscaler = Upscaler() if self.task_kind == 'upscale' else None
 
     def run(self):
         while True:
@@ -51,11 +51,12 @@ class Worker:
                 try:
 
                     result = self.generator.generate(
-                            request.prompt,
-                            batch_size=self.config.batch_size,
-                            batch_count=self.config.batch_count,
-                            inference_steps=self.config.inference_steps,
-                        ) if self.task_kind == 'diffusion' else self.upscaler.upscale()
+                        request.prompt,
+                        batch_size=self.config.batch_size,
+                        batch_count=self.config.batch_count,
+                        inference_steps=self.config.inference_steps,
+                    ) if self.task_kind == 'diffusion' else self.upscaler.upscale(
+                    )
 
                     images = result.save(
                         request_id=request.id,

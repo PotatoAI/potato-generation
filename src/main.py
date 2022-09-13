@@ -12,9 +12,15 @@ from logging import info, debug
 
 coloredlogs.install(level='INFO')
 
+
 def worker(args):
-    worker = Worker(output_dir=args.output_folder, gen_config=config().gen, dry_run=args.dry_run,
-                    until_done=args.until_done, task_kind=args.task_kind, )
+    worker = Worker(
+        output_dir=args.output_folder,
+        gen_config=config().gen,
+        dry_run=args.dry_run,
+        until_done=args.until_done,
+        task_kind=args.task_kind,
+    )
     worker.run()
 
 
@@ -48,21 +54,27 @@ def export_graphql_schema(args):
 
 parser = argparse.ArgumentParser(description='Generate some AI stuff')
 
-parser.add_argument('--config',
-                    help='Config file path',
-                    nargs='?',
-                    default='config.yaml')
-parser.add_argument('--verbose',
-                    help='Verbose output',
-                    action=argparse.BooleanOptionalAction)
+parser.add_argument(
+    '--config',
+    help='Config file path',
+    nargs='?',
+    default='config.yaml',
+)
+parser.add_argument(
+    '--verbose',
+    help='Verbose output',
+    action=argparse.BooleanOptionalAction,
+)
 parser.add_argument(
     '--dry-run',
     help='Simulate generation without actually genarting anything',
     action=argparse.BooleanOptionalAction)
-parser.add_argument('--output-folder',
-                    help='Prompt to use for one time generation',
-                    nargs='?',
-                    default='output')
+parser.add_argument(
+    '--output-folder',
+    help='Prompt to use for one time generation',
+    nargs='?',
+    default='output',
+)
 
 subparsers = parser.add_subparsers(help='sub-command help')
 
@@ -78,17 +90,21 @@ parser_wip = subparsers.add_parser('wip', help='Run Flask server')
 parser_worker.add_argument(
     '--until-done',
     help='Run worker until all jobs are processed, then exit',
-    action=argparse.BooleanOptionalAction)
+    action=argparse.BooleanOptionalAction,
+)
 
 parser_worker.add_argument(
     '--task-kind',
     help='What kind of worker to run (diffusion, upscale)',
-    default='diffusion', )
+    default='diffusion',
+)
 
-parser_request.add_argument('--prompt',
-                            help='Prompt to schedule a task',
-                            nargs='?',
-                            default='Cute cat')
+parser_request.add_argument(
+    '--prompt',
+    help='Prompt to schedule a task',
+    nargs='?',
+    default='Cute cat',
+)
 
 parser_worker.set_defaults(func=worker)
 parser_request.set_defaults(func=request)
