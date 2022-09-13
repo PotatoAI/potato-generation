@@ -36,5 +36,4 @@ class Upscaler:
             images.append(img)
 
         info(f"Upscaled {len(images)} images")
-        info(images)
         return images
