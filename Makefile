@@ -3,11 +3,14 @@ MAIN = poetry run python src/main.py
 request: config.yaml
 	$(MAIN) request --prompt "$(PROMPT)"
 
-worker: config.yaml
-	$(MAIN) worker
+worker-upscale: config.yaml
+	$(MAIN) worker --task-kind upscale
+
+worker-diffusion: config.yaml
+	$(MAIN) worker --task-kind diffusion
 
 worker-until-done: config.yaml
-	$(MAIN) worker --until-done
+	$(MAIN) worker --until-done --task-kind diffusion
 
 migrate: config.yaml
 	$(MAIN) migrate

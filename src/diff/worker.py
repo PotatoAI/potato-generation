@@ -5,6 +5,7 @@ import uuid
 from typing import List
 from diff.config import GenConfig, VideoConfig
 from diff.gen import Generator
+from diff.upscale import Upscaler
 from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
 from logging import info, error
 
@@ -16,16 +17,17 @@ class Worker:
         gen_config: GenConfig,
         dry_run=False,
         until_done=False,
+        task_kind='diffusion',
     ):
-        self.task_kind = "diffusion"
+        self.task_kind = task_kind
         self.output_dir = output_dir
         self.config = gen_config
         self.dry_run = dry_run
         self.until_done = until_done
+        self.generator =  Generator() if self.task_kind == 'diffusion' else  None
+        self.upscaler =  Upscaler() if self.task_kind == 'upscale' else  None
 
     def run(self):
-        gen = Generator()
-
         while True:
             avaliable_tasks = has_top_task(self.task_kind)
             info(f"{avaliable_tasks} Tasks in queue")
@@ -48,12 +50,12 @@ class Worker:
 
                 try:
 
-                    result = gen.generate(
-                        request.prompt,
-                        batch_size=self.config.batch_size,
-                        batch_count=self.config.batch_count,
-                        inference_steps=self.config.inference_steps,
-                    )
+                    result = self.generator.generate(
+                            request.prompt,
+                            batch_size=self.config.batch_size,
+                            batch_count=self.config.batch_count,
+                            inference_steps=self.config.inference_steps,
+                        ) if self.task_kind == 'diffusion' else self.upscaler.upscale()
 
                     images = result.save(
                         request_id=request.id,

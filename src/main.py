@@ -13,8 +13,8 @@ from logging import info, debug
 coloredlogs.install(level='INFO')
 
 def worker(args):
-    worker = Worker(args.output_folder, config().gen, args.dry_run,
-                    args.until_done)
+    worker = Worker(output_dir=args.output_folder, gen_config=config().gen, dry_run=args.dry_run,
+                    until_done=args.until_done, task_kind=args.task_kind, )
     worker.run()
 
 
@@ -79,6 +79,11 @@ parser_worker.add_argument(
     '--until-done',
     help='Run worker until all jobs are processed, then exit',
     action=argparse.BooleanOptionalAction)
+
+parser_worker.add_argument(
+    '--task-kind',
+    help='What kind of worker to run (diffusion, upscale)',
+    default='diffusion', )
 
 parser_request.add_argument('--prompt',
                             help='Prompt to schedule a task',
