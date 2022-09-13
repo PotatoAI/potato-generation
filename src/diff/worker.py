@@ -2,6 +2,7 @@ import time
 import os
 import socket
 import uuid
+import traceback
 from typing import List
 from diff.config import GenConfig, VideoConfig
 from diff.gen import Generator
@@ -11,7 +12,6 @@ from logging import info, error
 
 
 class Worker:
-
     def __init__(
         self,
         output_dir: str,
@@ -51,19 +51,24 @@ class Worker:
 
                 try:
 
-                    result = self.generator.generate(
-                        request.prompt,
-                        batch_size=self.config.batch_size,
-                        batch_count=self.config.batch_count,
-                        inference_steps=self.config.inference_steps,
-                    ) if self.task_kind == 'diffusion' else self.upscaler.upscale(
-                        rid=request.id)
+                    images = []
 
-                    images = result.save(
-                        request_id=request.id,
-                        task_id=task.id,
-                        folder=self.output_dir,
-                    )
+                    if self.task_kind == 'diffusion' and self.generator:
+                        result = self.generator.generate(
+                            request.prompt,
+                            batch_size=self.config.batch_size,
+                            batch_count=self.config.batch_count,
+                            inference_steps=self.config.inference_steps,
+                        )
+
+                        images = result.save(
+                            request_id=request.id,
+                            task_id=task.id,
+                            folder=self.output_dir,
+                        )
+
+                    if self.task_kind == 'upscale' and self.upscaler:
+                        images = self.upscaler.upscale(rid=request.id)
 
                     for img in images:
                         save_image(img, request.id, task.id)
@@ -74,6 +79,7 @@ class Worker:
                     task.status = 'error'
                     task.error = str(e)
                     error(e)
+                    traceback.print_exc()
                 finally:
                     task.running = False
             else:
@@ -83,7 +89,6 @@ class Worker:
 
 
 class SlideshowWorker:
-
     def __init__(self, config: VideoConfig):
         self.config = config
 
