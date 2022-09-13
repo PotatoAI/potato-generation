@@ -142,7 +142,7 @@ const MediaModal = (props: Props & ModalProps) => {
   };
 
   const src = `${prefix}/image/${currentId}`;
-  let el = <img alt="img" width={512} height={512} src={src} />;
+  let el = <img alt="img" width={512} height={512} src={src} key={src} />;
 
   if (kind === "video") {
     const src = `${prefix}/video/${currentId}`;
