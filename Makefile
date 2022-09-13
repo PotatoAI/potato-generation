@@ -3,7 +3,10 @@ MAIN = poetry run python src/main.py
 request: config.yaml
 	$(MAIN) request --prompt "$(PROMPT)"
 
-worker-upscale: config.yaml
+BSRGAN:
+	git clone git@github.com:PotatoAI/BSRGAN.git BSRGAN
+
+worker-upscale: config.yaml BSRGAN
 	$(MAIN) worker --task-kind upscale
 
 worker-diffusion: config.yaml

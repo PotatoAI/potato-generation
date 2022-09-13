@@ -213,7 +213,8 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
       model: "request",
       metadata: [],
     });
-    await refresh({ requestPolicy: "network-only" });
+    /* no point in refresh here since only schedules a task */
+    /* await refresh({ requestPolicy: "network-only" }); */
   };
 
   const genVid = async () => {

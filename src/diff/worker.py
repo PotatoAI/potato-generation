@@ -57,7 +57,7 @@ class Worker:
                         batch_count=self.config.batch_count,
                         inference_steps=self.config.inference_steps,
                     ) if self.task_kind == 'diffusion' else self.upscaler.upscale(
-                    )
+                        rid=request.id)
 
                     images = result.save(
                         request_id=request.id,
