@@ -206,6 +206,16 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     await refresh({ requestPolicy: "network-only" });
   };
 
+  const upscaleSelected = async () => {
+    await action({
+      ids: selected,
+      action: "upscale",
+      model: "request",
+      metadata: [],
+    });
+    await refresh({ requestPolicy: "network-only" });
+  };
+
   const genVid = async () => {
     await action({
       ids: selected,
@@ -257,6 +267,13 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
           color="warning"
         >
           Re-Run
+        </Button>
+        <Button
+          disabled={selected.length === 0}
+          onClick={upscaleSelected}
+          color="warning"
+        >
+          Upscale
         </Button>
         <Button
           disabled={selected.length === 0}

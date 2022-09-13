@@ -27,24 +27,28 @@ def real_id(hx: str) -> int:
 
 
 class Request(SQLAlchemyObjectType):
+
     class Meta:
         model = RequestModel
         interfaces = (relay.Node, )
 
 
 class Task(SQLAlchemyObjectType):
+
     class Meta:
         model = TaskModel
         interfaces = (relay.Node, )
 
 
 class Image(SQLAlchemyObjectType):
+
     class Meta:
         model = ImageModel
         interfaces = (relay.Node, )
 
 
 class Video(SQLAlchemyObjectType):
+
     class Meta:
         model = VideoModel
         interfaces = (relay.Node, )
@@ -86,6 +90,7 @@ class Query(graphene.ObjectType):
 
 
 class CreateRequest(graphene.Mutation):
+
     class Arguments:
         prompt = graphene.String()
         count = graphene.Int()
@@ -100,6 +105,7 @@ class CreateRequest(graphene.Mutation):
 
 
 class DoAction(graphene.Mutation):
+
     class Arguments:
         ids = graphene.List(graphene.NonNull(graphene.String))
         action = graphene.NonNull(graphene.String)
@@ -151,6 +157,9 @@ class DoAction(graphene.Mutation):
                     count = int(metadata[0])
                 add_new_request(request.prompt, count=count)
 
+        if action == 'upscale' and model == 'request':
+            for rid in real_ids:
+                schedule_request(rid, kind='upscale')
 
         if action == 're-run':
             if model == 'request':
