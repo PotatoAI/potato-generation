@@ -14,6 +14,8 @@ class Upscaler:
         img_folder = "output/tmp"
         request = get_request(rid)
 
+        os.makedirs(img_folder, exist_ok=True)
+
         for image in request.images:
             print(f"Image {image.oid}")
 
@@ -24,11 +26,14 @@ class Upscaler:
 
             command = f"cd {self.runtime_path} && make upscale"
             info(command)
+            os.system(command)
+
             img_out_fname = f"{image.id}.png"
-            os.makedirs(img_folder, exist_ok=True)
             command = f"cp {self.runtime_path}/output.png {img_folder}/{img_out_fname}"
             info(command)
-            # images.append(img_out_fname)
+            os.system(command)
 
-        warn(f"Upscale not implemented {request.id}")
+            images.append(img_out_fname)
+
+        info(f"Upscaled {len(images)} images")
         return ImagesResult(images, 0, len(images))
