@@ -11,6 +11,7 @@ from logging import info, error
 
 
 class Worker:
+
     def __init__(
         self,
         output_dir: str,
@@ -43,7 +44,7 @@ class Worker:
                 task, request = get_top_task(self.task_kind)
                 task.worker_id = socket.gethostname()
                 task.running = True
-                log = f"Running generator for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
+                log = f"Running {self.task_kind} for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
                 info(log)
                 task.log = log
                 commit()
@@ -82,6 +83,7 @@ class Worker:
 
 
 class SlideshowWorker:
+
     def __init__(self, config: VideoConfig):
         self.config = config
 

@@ -160,6 +160,7 @@ class DoAction(graphene.Mutation):
         if action == 'upscale' and model == 'request':
             for rid in real_ids:
                 schedule_request(rid, kind='upscale')
+            return ok
 
         if action == 're-run':
             if model == 'request':

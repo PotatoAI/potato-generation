@@ -142,7 +142,6 @@ def query_top_tasks(kind: str):
         Task.running == False,
         Task.status == 'new',
         Request.approved == True,
-        Request.kind == kind,
         Task.kind == kind,
     ).order_by(desc(Task.priority)).order_by(Task.created_on)
 
@@ -196,10 +195,10 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
 
 
 def get_image_data(id: int) -> bytearray:
-    image =  db_session.query(Image).filter(Image.id == id).one()
+    image = db_session.query(Image).filter(Image.id == id).one()
     return read_binary_file(image.oid)
 
 
 def get_video_data(id: int) -> bytearray:
-    video =  db_session.query(Video).filter(Video.id == id).one()
+    video = db_session.query(Video).filter(Video.id == id).one()
     return read_binary_file(video.oid)

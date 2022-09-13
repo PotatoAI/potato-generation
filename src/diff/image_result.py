@@ -1,8 +1,10 @@
 import uuid
+import os
 from PIL import Image
 from typing import List, Any
 from logging import info
 from dataclasses import dataclass
+
 
 @dataclass
 class ImagesResult:
