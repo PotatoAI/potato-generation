@@ -5,6 +5,7 @@ import uuid
 import traceback
 import asyncio
 import nats
+import json
 from typing import List
 from diff.config import GenConfig, NatsConfig, VideoConfig
 from diff.gen import Generator
@@ -37,79 +38,77 @@ class Worker:
         js = self.nc.jetstream()
         await js.add_stream(name="worker-stream", subjects=[queue])
 
-        # generator = Generator()
-        # upscaler = Upscaler()
         async def cb(msg):
-            info(msg)
+            data = msg.data.decode()
+            task = BaseTask(**json.loads(data))
+            info(f"Task: {task.json()}")
+            if task.kind == 'diffusion':
+                self.diffusion(task.request_id)
+            if task.kind == 'upscale':
+                self.upscale(task.request_id)
+            await msg.ack()
 
-        await js.subscribe(queue, cb=cb)
-        ack = await js.publish(queue, b'testtest')
-        info(ack)
+        await js.subscribe(queue, f"worker-{self.task_kind}", cb=cb)
         info(f"Started loop for {queue}")
 
     def run(self):
+        if self.task_kind == 'diffusion':
+            self.generator = None  # Generator()
+        if self.task_kind == 'upscale':
+            self.upscaler = Upscaler()
+
         loop = asyncio.new_event_loop()
         loop.run_until_complete(self.loop())
         loop.run_forever()
         loop.close()
 
-    def tmp(self):
-        while True:
-            avaliable_tasks = has_top_task(self.task_kind)
-            info(f"{avaliable_tasks} Tasks in queue")
+    def diffusion(self, rid: int):
+        try:
+            request = get_request(rid)
+            info(f"Diffusion for request#{rid} \"{request.prompt}\"")
+            images = []
 
-            if avaliable_tasks == 0:
-                if self.until_done:
-                    info("Queue is empty, exiting worker")
-                    return
-                info('Waiting in a loop')
-                time.sleep(10)
+            if self.task_kind == 'diffusion' and self.generator:
+                result = self.generator.generate(
+                    request.prompt,
+                    batch_size=self.config.batch_size,
+                    batch_count=self.config.batch_count,
+                    inference_steps=self.config.inference_steps,
+                )
 
-            if not self.dry_run and avaliable_tasks > 0:
-                task, request = get_top_task(self.task_kind)
-                task.worker_id = socket.gethostname()
-                task.running = True
-                log = f"Running {self.task_kind} for \"{request.prompt}\" task #{task.id} -> request #{request.id}"
-                info(log)
-                task.log = log
-                commit()
+                images = result.save(
+                    request_id=request.id,
+                    task_id=1,
+                    folder=self.output_dir,
+                )
 
-                try:
+            for img in images:
+                save_image(img, rid, 1)
 
-                    images = []
+            request.generated = True
+        except Exception as e:
+            error(e)
+            traceback.print_exc()
+        finally:
+            commit()
 
-                    if self.task_kind == 'diffusion' and self.generator:
-                        result = self.generator.generate(
-                            request.prompt,
-                            batch_size=self.config.batch_size,
-                            batch_count=self.config.batch_count,
-                            inference_steps=self.config.inference_steps,
-                        )
+    def upscale(self, rid: int):
+        try:
+            request = get_request(rid)
+            info(f"Upscale for request#{rid} \"{request.prompt}\"")
+            images = []
 
-                        images = result.save(
-                            request_id=request.id,
-                            task_id=task.id,
-                            folder=self.output_dir,
-                        )
+            if self.upscaler:
+                images = self.upscaler.upscale(rid=rid)
 
-                    if self.task_kind == 'upscale' and self.upscaler:
-                        images = self.upscaler.upscale(rid=request.id)
+            for img in images:
+                save_image(img, rid, 1)
 
-                    for img in images:
-                        save_image(img, request.id, task.id)
-
-                    task.status = 'success'
-                    request.generated = True
-                except Exception as e:
-                    task.status = 'error'
-                    task.error = str(e)
-                    error(e)
-                    traceback.print_exc()
-                finally:
-                    task.running = False
-            else:
-                info('Dry Run')
-
+            request.generated = True
+        except Exception as e:
+            error(e)
+            traceback.print_exc()
+        finally:
             commit()
 
 
