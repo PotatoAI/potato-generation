@@ -173,7 +173,7 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
 def get_image_data(id: int, quality: str = 'best') -> bytearray:
     image = db_session.query(Image).filter(Image.id == id).one()
 
-    oid = image.hqoid or image.oid
+    oid = image.oid
     if quality == 'best':
         oid = image.hqoid or image.oid
     if quality == 'hq':
