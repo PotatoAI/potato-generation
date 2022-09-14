@@ -15,7 +15,10 @@ def db_url(cfg: DBConfig):
 
 
 def connect(cfg: DBConfig) -> Engine:
-    return create_engine(db_url(cfg), echo=bool(cfg.echo))
+    return create_engine(db_url(cfg),
+                         echo=bool(cfg.echo),
+                         pool_size=50,
+                         max_overflow=10)
 
 
 def migrate(cfg: DBConfig):
