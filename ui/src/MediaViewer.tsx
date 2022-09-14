@@ -81,8 +81,12 @@ const ExtraControlsVideo = (props: { id: string }) => {
   );
 };
 
-const ExtraControlsImage = (props: { id: string }) => {
-  const { id } = props;
+const ExtraControlsImage = (props: {
+  id: string;
+  toggleQuality: () => void;
+  quality: string;
+}) => {
+  const { id, toggleQuality, quality } = props;
   const [actionResult, action] = useDoActionMutation();
   const [imageDetails, refresh] = useImagesByIdQuery({
     variables: { imageIds: [id] },
@@ -112,11 +116,18 @@ const ExtraControlsImage = (props: { id: string }) => {
 
   const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
   const label = isSelected ? "Deselect" : "Select";
-  const qualLabel = isHq ? "HQ" : "LQ";
+  let qualLabel = isHq ? "HQ" : "LQ";
+
+  if (quality === "lq") {
+    qualLabel = "LQ";
+  }
 
   return (
     <>
-      <Button color={isHq ? "success" : "warning"}>
+      <Button
+        color={qualLabel === "HQ" ? "success" : "warning"}
+        onClick={toggleQuality}
+      >
         {imageDetails.fetching ? loader : qualLabel}
       </Button>
 
@@ -124,7 +135,7 @@ const ExtraControlsImage = (props: { id: string }) => {
         color={isSelected ? "warning" : "success"}
         onClick={isSelected ? deselect : select}
       >
-        {actionResult.fetching ? loader : label}
+        {actionResult.fetching || imageDetails.fetching ? loader : label}
       </Button>
     </>
   );
@@ -141,6 +152,11 @@ const MediaModal = (props: Props & ModalProps) => {
   const [focused, setFocused] = useState(0);
   const currentId = ids[focused];
   const prefix = "http://localhost:5000";
+  const [bestQuality, setBestQuality] = useState(true);
+
+  const toggleQuality = () => {
+    setBestQuality((v) => !v);
+  };
 
   const prev = () => {
     setFocused((focused) => {
@@ -150,6 +166,8 @@ const MediaModal = (props: Props & ModalProps) => {
 
       return oids.length - 1;
     });
+
+    setBestQuality(true);
   };
 
   const next = () => {
@@ -160,6 +178,8 @@ const MediaModal = (props: Props & ModalProps) => {
 
       return 0;
     });
+
+    setBestQuality(true);
   };
 
   const [actionResult, action] = useDoActionMutation();
@@ -175,7 +195,11 @@ const MediaModal = (props: Props & ModalProps) => {
     /* await refresh({ requestPolicy: "network-only" }); */
   };
 
-  const src = `${prefix}/image/${currentId}`;
+  let src = `${prefix}/image/${currentId}`;
+  if (!bestQuality) {
+    src = `${prefix}/image/lq/${currentId}`;
+  }
+
   let el = <img alt="img" width={512} height={512} src={src} key={src} />;
 
   if (kind === "video") {
@@ -188,8 +212,15 @@ const MediaModal = (props: Props & ModalProps) => {
   }
 
   const label = `${focused + 1} / ${oids.length}`;
+  const quality = bestQuality ? "best" : "lq";
 
-  let extraControls = <ExtraControlsImage id={currentId} />;
+  let extraControls = (
+    <ExtraControlsImage
+      id={currentId}
+      quality={quality}
+      toggleQuality={toggleQuality}
+    />
+  );
   if (kind === "video") {
     extraControls = <ExtraControlsVideo id={currentId} />;
   }

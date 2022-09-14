@@ -85,7 +85,6 @@ class Query(graphene.ObjectType):
 
     def resolve_images_by_id(self, info, image_ids) -> List[ImageModel]:
         real_ids = list(map(real_id, image_ids))
-        print(real_ids)
         return get_images(real_ids)
 
 
