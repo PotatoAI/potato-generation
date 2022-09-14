@@ -15,4 +15,4 @@ gen:
   batch_count: 1
 video:
   frames_per_pic: 3
-  scale: 50%
+  scale: 512x512
