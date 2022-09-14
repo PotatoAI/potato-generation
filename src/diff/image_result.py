@@ -15,7 +15,6 @@ class ImagesResult:
     def save(
         self,
         request_id: int,
-        task_id: int,
         folder: str,
     ) -> List[str]:
         path = f"{folder}/{request_id}"
@@ -25,7 +24,7 @@ class ImagesResult:
 
         for i, img in enumerate(self.images):
             id = uuid.uuid1()
-            fname = f"{path}/{task_id}-{i}-{id}.png"
+            fname = f"{path}/{i}-{id}.png"
             img.save(fname)
             images.append(fname)
 

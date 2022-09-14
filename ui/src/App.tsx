@@ -152,10 +152,6 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     { field: "kind" },
     { field: "createdOn", width: dateColW },
     { field: "updatedOn", width: dateColW },
-    {
-      field: "tasks",
-      valueGetter: (params) => params.row.tasks["edges"].length,
-    },
   ];
 
   const rows = data?.allRequests?.edges?.map((edge) => edge?.node) ?? [];

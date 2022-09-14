@@ -116,7 +116,6 @@ class Worker:
 
                 images = result.save(
                     request_id=request.id,
-                    task_id=1,
                     folder=self.output_dir,
                 )
 

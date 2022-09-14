@@ -147,7 +147,6 @@ def save_image(fname: str, rid: int, tid: int):
     oid = save_binary_file(fname)
     img = Image(
         request_id=rid,
-        task_id=tid,
         filename=fname,
         oid=oid,
     )
