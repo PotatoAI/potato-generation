@@ -87,6 +87,11 @@ class Query(graphene.ObjectType):
     all_videos = SQLAlchemyConnectionField(Video.connection)
 
 
+async def mutate_async(info, prompt, count) -> RequestModel:
+    nc = await nats.connect(config().nats.url())
+    return await add_new_request(nc, prompt, count=count)
+
+
 class CreateRequest(graphene.Mutation):
     class Arguments:
         prompt = graphene.String()
@@ -96,7 +101,7 @@ class CreateRequest(graphene.Mutation):
     request = graphene.Field(lambda: Request)
 
     def mutate(self, info, prompt, count):
-        request = add_new_request(prompt, count=count)
+        request = asyncio.run(mutate_async(info, prompt, count))
         ok = True
         return CreateRequest(request=request, ok=ok)
 

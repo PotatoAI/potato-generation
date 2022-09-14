@@ -1,15 +1,14 @@
 import os
 from typing import List
 from logging import warn, info
-from diff.storage import get_request, read_binary_file
+from diff.storage import get_request, read_binary_file, save_binary_file, commit
 
 
 class Upscaler:
     def __init__(self):
         self.runtime_path = "BSRGAN"
 
-    def upscale(self, rid: int) -> List[str]:
-        images = []
+    def upscale(self, rid: int):
         img_folder = "output/tmp"
         request = get_request(rid)
 
@@ -33,7 +32,9 @@ class Upscaler:
             info(command)
             os.system(command)
 
-            images.append(img)
+            image.hqoid = save_binary_file(fname)
+            info(f"Saved HQ version of image#{image.id}")
+            commit()
 
         info(f"Upscaled {len(images)} images")
         return images

@@ -66,6 +66,7 @@ class Image(Base):
     request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
     task_id = Column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'))
     oid = Column(OID)
+    hqoid = Column(OID)
 
 
 class Video(Base):

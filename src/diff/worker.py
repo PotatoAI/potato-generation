@@ -37,7 +37,7 @@ class Worker:
         await self.nats_connect()
         queue = self.queue()
         js = self.nc.jetstream()
-        await js.add_stream(name=f"worker-stream-{queue}", subjects=[queue])
+        await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
 
         async def base_cb(msg):
             data = msg.data.decode()
@@ -137,10 +137,7 @@ class Worker:
             images = []
 
             if self.upscaler:
-                images = self.upscaler.upscale(rid=rid)
-
-            for img in images:
-                save_image(img, rid, 1)
+                self.upscaler.upscale(rid=rid)
 
             request.generated = True
         except Exception as e:

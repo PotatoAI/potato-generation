@@ -53,7 +53,7 @@ def commit():
 async def schedule_task(nc, kind: str, task):
     queue = f"tasks-{kind}"
     js = nc.jetstream()
-    await js.add_stream(name=f"worker-stream-{queue}", subjects=[queue])
+    await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
     info(f"Scheduling task {task.json()} to {queue}")
     ack = await js.publish(queue, task.json().encode())
     info(ack)
@@ -61,7 +61,7 @@ async def schedule_task(nc, kind: str, task):
 
 async def schedule_request(nc, rid: int, kind: str = "diffusion"):
     task = BaseTask(request_id=rid, kind=kind)
-    schedule_task(nc, queue, task)
+    await schedule_task(nc, kind, task)
 
 
 async def add_new_request(
@@ -84,7 +84,7 @@ async def add_new_request(
     db_session.commit()
     info(f"Created new request {req.id}")
     for _ in range(count):
-        await schedule_request(nc, req.id, priority, kind=kind)
+        await schedule_request(nc, rid=req.id, kind=kind)
     return req
 
 
@@ -185,7 +185,7 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
 
 def get_image_data(id: int) -> bytearray:
     image = db_session.query(Image).filter(Image.id == id).one()
-    return read_binary_file(image.oid)
+    return read_binary_file(image.hqoid or image.oid)
 
 
 def get_video_data(id: int) -> bytearray:
