@@ -24,6 +24,9 @@ Flask-Cors = "^3.0.10"
 alembic = "^1.8.1"
 nats-py = "^2.1.7"
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [tool.poetry.dev-dependencies]
 
 [build-system]

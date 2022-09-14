@@ -14,7 +14,7 @@ from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Image as ImageModel, Video as VideoModel
 from diff.messages import GenVideoTask, AddAudioTask
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file, get_request, schedule_task
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, schedule_request, select_images, read_binary_file, get_request, schedule_task
 from diff.config import config
 from base64 import b64decode
 from typing import List
@@ -127,9 +127,6 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
         if model == 'request':
             delete_requests(real_ids)
             return ok
-        if model == 'task':
-            delete_tasks(real_ids)
-            return ok
         if model == 'image':
             delete_images(real_ids)
             return ok
@@ -158,9 +155,6 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
             for _ in range(count):
                 for rid in real_ids:
                     await schedule_request(nc, rid, kind='diffusion')
-            return ok
-        if model == 'task':
-            await reschedule_tasks(nc, real_ids)
             return ok
 
     if action == 'select' and model == 'image':

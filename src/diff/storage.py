@@ -30,7 +30,7 @@ def read_binary_file(oid: int) -> bytearray:
     return l_obj.read()
 
 
-def delete_binary_file(oid: int) -> bytearray:
+def delete_binary_file(oid: int):
     conn = db_engine.raw_connection()
     l_obj = conn.lobject(oid, 'n')
     l_obj.unlink()
@@ -88,13 +88,6 @@ async def add_new_request(
     return req
 
 
-async def reschedule_tasks(nc, ids: List[int]):
-    tasks = db_session.query(Task).filter(Task.id.in_(ids)).all()
-    for task in tasks:
-        await schedule_request(nc, task.request_id)
-    db_session.commit()
-
-
 def select_images(ids: List[int]):
     imgs = db_session.query(Image).filter(Image.id.in_(ids)).all()
     for img in imgs:
@@ -111,11 +104,6 @@ def approve_requests(ids: List[int]):
 
 def delete_requests(ids: List[int]):
     db_session.query(Request).filter(Request.id.in_(ids)).delete()
-    db_session.commit()
-
-
-def delete_tasks(ids: List[int]):
-    db_session.query(Task).filter(Task.id.in_(ids)).delete()
     db_session.commit()
 
 

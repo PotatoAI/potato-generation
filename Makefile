@@ -56,3 +56,6 @@ config.yaml:
 clean:
 	rm -f ui/src/graphql/schema.json
 	rm -f ui/src/generated/*.ts
+
+mypy:
+	poetry run mypy src/

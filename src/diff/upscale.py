@@ -35,6 +35,3 @@ class Upscaler:
             image.hqoid = save_binary_file(fname)
             info(f"Saved HQ version of image#{image.id}")
             commit()
-
-        info(f"Upscaled {len(images)} images")
-        return images

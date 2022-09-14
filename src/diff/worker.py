@@ -133,7 +133,6 @@ class Worker:
         try:
             request = get_request(rid)
             info(f"Upscale for request#{rid} \"{request.prompt}\"")
-            images = []
 
             if self.upscaler:
                 self.upscaler.upscale(rid=rid)
