@@ -8,6 +8,7 @@ import diff.db
 import logging
 import base64
 import asyncio
+import nats
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
@@ -107,6 +108,7 @@ class CreateRequest(graphene.Mutation):
 
 async def do_action_async(info, ids, action, model, metadata) -> bool:
     ok = True
+    nc = await nats.connect(config().nats.url())
 
     real_ids = list(map(real_id, ids))
 
@@ -146,11 +148,11 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
             count = 5
             if len(metadata) > 0 and metadata[0]:
                 count = int(metadata[0])
-            await add_new_request(request.prompt, count=count)
+            await add_new_request(nc, request.prompt, count=count)
 
     if action == 'upscale' and model == 'request':
         for rid in real_ids:
-            await schedule_request(rid, kind='upscale')
+            await schedule_request(nc, rid, kind='upscale')
         return ok
 
     if action == 're-run':
@@ -160,10 +162,10 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
                 count = int(metadata[0])
             for _ in range(count):
                 for rid in real_ids:
-                    await schedule_request(rid, kind='diffusion')
+                    await schedule_request(nc, rid, kind='diffusion')
             return ok
         if model == 'task':
-            await reschedule_tasks(real_ids)
+            await reschedule_tasks(nc, real_ids)
             return ok
 
     if action == 'select' and model == 'image':

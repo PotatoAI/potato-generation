@@ -125,7 +125,6 @@ debug(args)
 diff.config.init_config(args.config)
 debug(config())
 diff.storage.init_db_session(config().db)
-diff.storage.connect_nats(config().nats)
 login(config().hf.token)
 
 args.func(args)

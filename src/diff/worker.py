@@ -36,19 +36,22 @@ class Worker:
         queue = self.queue()
         js = self.nc.jetstream()
         await js.add_stream(name="worker-stream", subjects=[queue])
-        info(f"Started loop for {queue}")
 
         # generator = Generator()
         # upscaler = Upscaler()
-        psub = await js.pull_subscribe(queue, "psub")
+        async def cb(msg):
+            info(msg)
 
-        while True:
-            msgs = await psub.fetch(1)
-            for msg in msgs:
-                info(msg)
+        await js.subscribe(queue, cb=cb)
+        ack = await js.publish(queue, b'testtest')
+        info(ack)
+        info(f"Started loop for {queue}")
 
     def run(self):
-        asyncio.run(self.loop())
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self.loop())
+        loop.run_forever()
+        loop.close()
 
     def tmp(self):
         while True:

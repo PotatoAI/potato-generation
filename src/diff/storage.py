@@ -12,7 +12,6 @@ import asyncio
 
 db_engine: Engine
 db_session: scoped_session
-nc: nats.aio.client.Client
 
 
 def save_binary_file(fname: str) -> int:
@@ -39,15 +38,6 @@ def delete_binary_file(oid: int) -> bytearray:
     conn.close()
 
 
-def connect_nats(cfg: NatsConfig):
-
-    async def init_nats(cfg: NatsConfig):
-        global nc
-        nc = await nats.connect(cfg.url())
-
-    asyncio.run(init_nats(cfg))
-
-
 def init_db_session(cfg: DBConfig):
     info("Initializing db session")
     global db_engine
@@ -60,18 +50,20 @@ def commit():
     db_session.commit()
 
 
-async def schedule_request(rid: int, kind: str = "diffusion"):
+async def schedule_request(nc, rid: int, kind: str = "diffusion"):
     task = BaseTask(request_id=rid, kind=kind)
     queue = f"tasks-{kind}"
     info(f"Scheduling task {task.json()} to {queue}")
-    global nc
     js = nc.jetstream()
+    print(nc)
+    print(js)
     await js.add_stream(name="worker-stream", subjects=[queue])
     ack = await js.publish(queue, task.json().encode())
     info(ack)
 
 
 async def add_new_request(
+    nc,
     prompt: str,
     count: int = 1,
     kind: str = "diffusion",
@@ -94,10 +86,10 @@ async def add_new_request(
     return req
 
 
-async def reschedule_tasks(ids: List[int]):
+async def reschedule_tasks(nc, ids: List[int]):
     tasks = db_session.query(Task).filter(Task.id.in_(ids)).all()
     for task in tasks:
-        await schedule_request(task.request_id)
+        await schedule_request(nc, task.request_id)
     db_session.commit()
 
 
