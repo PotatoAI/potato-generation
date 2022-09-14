@@ -93,6 +93,8 @@ const ExtraControlsImage = (props: { id: string }) => {
     (img) => img?.selected
   );
 
+  const isHq = imageDetails.data?.imagesById?.some((img) => img?.hqoid);
+
   const select = async () => {
     await action({ ids: [id], action: "select", model: "image", metadata: [] });
     await refresh();
@@ -110,16 +112,21 @@ const ExtraControlsImage = (props: { id: string }) => {
 
   const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
   const label = isSelected ? "Deselect" : "Select";
+  const qualLabel = isHq ? "HQ" : "LQ";
 
   return (
-    <Box>
+    <>
+      <Button color={isHq ? "success" : "warning"}>
+        {imageDetails.fetching ? loader : qualLabel}
+      </Button>
+
       <Button
         color={isSelected ? "warning" : "success"}
         onClick={isSelected ? deselect : select}
       >
         {actionResult.fetching ? loader : label}
       </Button>
-    </Box>
+    </>
   );
 };
 
