@@ -12,7 +12,7 @@ import nats
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel, Video as VideoModel
+from diff.schema import Request as RequestModel Image as ImageModel, Video as VideoModel
 from diff.messages import GenVideoTask, AddAudioTask
 from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file, get_request, schedule_task
 from diff.config import config
@@ -33,11 +33,6 @@ class Request(SQLAlchemyObjectType):
         model = RequestModel
         interfaces = (relay.Node, )
 
-
-class Task(SQLAlchemyObjectType):
-    class Meta:
-        model = TaskModel
-        interfaces = (relay.Node, )
 
 
 class Image(SQLAlchemyObjectType):
@@ -82,7 +77,6 @@ class Query(graphene.ObjectType):
         return glob.glob('input/**/*')
 
     all_requests = SQLAlchemyConnectionField(Request.connection)
-    all_tasks = SQLAlchemyConnectionField(Task.connection)
     all_images = SQLAlchemyConnectionField(Image.connection)
     all_videos = SQLAlchemyConnectionField(Video.connection)
 

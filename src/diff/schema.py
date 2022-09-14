@@ -19,10 +19,6 @@ class Request(Base):
     updated_on = Column(DateTime(),
                         default=datetime.now,
                         onupdate=datetime.now)
-    tasks = relationship("Task",
-                         cascade="all, delete",
-                         backref="request",
-                         passive_deletes=True)
     images = relationship("Image",
                           cascade="all, delete",
                           backref="request",
@@ -30,27 +26,6 @@ class Request(Base):
     videos = relationship("Video",
                           cascade="all, delete",
                           backref="request",
-                          passive_deletes=True)
-
-
-class Task(Base):
-    __tablename__ = 'tasks'
-    id = Column(Integer(), primary_key=True)
-    running = Column(Boolean(), default=False)
-    status = Column(String(50), nullable=False, default='new')
-    error = Column(Text(), nullable=True)
-    log = Column(Text(), nullable=True)
-    priority = Column(Integer(), default=0)
-    worker_id = Column(String(100), nullable=False, default='unknown')
-    kind = Column(String(100), nullable=False, default='unknown')
-    created_on = Column(DateTime(), default=datetime.now)
-    updated_on = Column(DateTime(),
-                        default=datetime.now,
-                        onupdate=datetime.now)
-    request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
-    images = relationship("Image",
-                          cascade="all, delete",
-                          backref="task",
                           passive_deletes=True)
 
 
@@ -64,7 +39,6 @@ class Image(Base):
                         default=datetime.now,
                         onupdate=datetime.now)
     request_id = Column(Integer, ForeignKey('requests.id', ondelete='CASCADE'))
-    task_id = Column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'))
     oid = Column(OID)
     hqoid = Column(OID)
 
