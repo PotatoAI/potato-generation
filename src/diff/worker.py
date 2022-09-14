@@ -53,7 +53,7 @@ class Worker:
 
     def run(self):
         if self.task_kind == 'diffusion':
-            self.generator = None  # Generator()
+            self.generator = Generator()
         if self.task_kind == 'upscale':
             self.upscaler = Upscaler()
 
