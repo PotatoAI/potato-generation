@@ -109,9 +109,9 @@ class Worker:
             if self.task_kind == 'diffusion' and self.generator:
                 result = self.generator.generate(
                     request.prompt,
-                    batch_size=self.config.batch_size,
-                    batch_count=self.config.batch_count,
-                    inference_steps=self.config.inference_steps,
+                    batch_size=self.gen_config.batch_size,
+                    batch_count=self.gen_config.batch_count,
+                    inference_steps=self.gen_config.inference_steps,
                 )
 
                 images = result.save(
