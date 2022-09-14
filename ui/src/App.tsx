@@ -237,13 +237,6 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
       <Portal container={props.portalRef.current}>
         <Button
           disabled={selected.length === 0}
-          onClick={approveSelected}
-          color="success"
-        >
-          Approve
-        </Button>
-        <Button
-          disabled={selected.length === 0}
           onClick={genVid}
           color="success"
         >
