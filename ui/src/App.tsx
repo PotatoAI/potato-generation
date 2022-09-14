@@ -1,12 +1,10 @@
 import React, { useState, useRef, MutableRefObject } from "react";
 import {
   useAllRequestsQuery,
-  useAllTasksQuery,
   useAllImagesQuery,
   useAllVideosQuery,
   useDoActionMutation,
   RequestSortEnum,
-  TaskSortEnum,
   ImageSortEnum,
   VideoSortEnum,
 } from "./generated/graphql";
@@ -291,104 +289,6 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   );
 };
 
-const TasksDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
-  const [selected, setSelected] = useState<Array<string>>([]);
-  const [result, refresh] = useAllTasksQuery({
-    variables: { sort: TaskSortEnum.CreatedOnDesc },
-    requestPolicy: "network-only",
-  });
-
-  const { data, fetching, error } = result;
-
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 90 },
-    { field: "running" },
-    { field: "status" },
-    {
-      field: "error",
-      width: 150,
-    },
-    {
-      field: "log",
-      width: 150,
-    },
-    { field: "priority" },
-    { field: "workerId", width: 120 },
-    { field: "kind" },
-    {
-      field: "images",
-      renderCell: (p) => {
-        const data = p.row.images.edges.map(
-          (i: { node: { oid: number; id: string } }) => i.node
-        );
-        return <MediaViewer mediaData={data} kind="image" />;
-      },
-    },
-    { field: "createdOn", width: dateColW },
-    { field: "updatedOn", width: dateColW },
-    { field: "requestId" },
-  ];
-
-  const rows = data?.allTasks?.edges?.map((edge) => edge?.node) ?? [];
-
-  const [actionResult, action] = useDoActionMutation();
-
-  const deleteSelected = async () => {
-    await action({
-      ids: selected,
-      action: "delete",
-      model: "task",
-      metadata: [],
-    });
-    await refresh({ requestPolicy: "network-only" });
-  };
-
-  const reRunSelected = async () => {
-    await action({
-      ids: selected,
-      action: "re-run",
-      model: "task",
-      metadata: [],
-    });
-    await refresh({ requestPolicy: "network-only" });
-  };
-
-  const dataGrid = (
-    <MyDataGrid
-      rows={rows}
-      columns={columns}
-      onSelectionModelChange={(ids) => setSelected(ids as string[])}
-    />
-  );
-
-  return (
-    <>
-      <p>{error ? JSON.stringify(error) : ""}</p>
-      <LoadingModal loading={fetching || actionResult.fetching} />
-      {dataGrid}
-      <Portal container={props.portalRef.current}>
-        <Button
-          disabled={selected.length === 0}
-          onClick={deleteSelected}
-          color="error"
-        >
-          Delete
-        </Button>
-        <Button
-          disabled={selected.length === 0}
-          onClick={reRunSelected}
-          color="warning"
-        >
-          Re-Run
-        </Button>
-        <RefreshButton
-          refresh={() => refresh({ requestPolicy: "network-only" })}
-        />
-      </Portal>
-    </>
-  );
-};
-
 const ImagesDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
   const [selected, setSelected] = useState<Array<string>>([]);
   const [result, refresh] = useAllImagesQuery({
@@ -560,7 +460,7 @@ const VideosDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
 };
 
 const App = () => {
-  const allTabs = ["requests", "tasks", "images", "videos"];
+  const allTabs = ["requests", "images", "videos"];
   const [currentTabI, setCurrentTabI] = useState(0);
   const currentTab = allTabs[currentTabI];
   const container = useRef(null);
@@ -569,10 +469,6 @@ const App = () => {
   // console.log(res);
 
   let dataGrid = <RequestsDataGrid portalRef={container} />;
-
-  if (currentTab === "tasks") {
-    dataGrid = <TasksDataGrid portalRef={container} />;
-  }
 
   if (currentTab === "images") {
     dataGrid = <ImagesDataGrid portalRef={container} />;

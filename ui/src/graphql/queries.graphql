@@ -10,16 +10,6 @@ query AllRequests($sort: [RequestSortEnum]) {
         kind,
         createdOn,
         updatedOn,
-        tasks {
-          edges {
-            node {
-              id,
-              status,
-              running,
-              error,
-            }
-          }
-        },
         images {
           edges {
             node {
@@ -30,35 +20,6 @@ query AllRequests($sort: [RequestSortEnum]) {
           }
         },
         videos {
-          edges {
-            node {
-              id,
-              filename,
-              oid,
-            }
-          }
-        },
-      }
-    }
-  }
-}
-
-query AllTasks($sort: [TaskSortEnum]) {
-  allTasks(sort: $sort) {
-    edges {
-      node {
-        id,
-        running,
-        status,
-        error,
-        log,
-        priority,
-        workerId,
-        kind,
-        createdOn,
-        updatedOn,
-        requestId,
-        images {
           edges {
             node {
               id,
@@ -83,7 +44,6 @@ query AllImages($sort: [ImageSortEnum]) {
         createdOn,
         updatedOn,
         requestId,
-        taskId,
         oid,
       }
     }
