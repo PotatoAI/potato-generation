@@ -18,6 +18,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import { ChaoticOrbit } from "@uiball/loaders";
 
+const prefix = "http://localhost:5000";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -151,7 +153,6 @@ const MediaModal = (props: Props & ModalProps) => {
   const ids = mediaData.map((r) => r.id);
   const [focused, setFocused] = useState(0);
   const currentId = ids[focused];
-  const prefix = "http://localhost:5000";
   const [bestQuality, setBestQuality] = useState(true);
 
   const toggleQuality = () => {
@@ -265,18 +266,48 @@ const MediaModal = (props: Props & ModalProps) => {
 export const MediaViewer = (props: Props) => {
   const { mediaData, kind } = props;
   const [modalOpen, setModalOpen] = useState(false);
+  const [current, setCurrent] = useState(0);
+
+  const next = () => {
+    setCurrent((c) => (c < mediaData.length ? c + 1 : 0));
+  };
+
+  let preview = <span></span>;
+
+  if (kind === "image" && mediaData.length > 0) {
+    const id = mediaData[current].id;
+    const src = `${prefix}/image/lq/${id}`;
+    preview = (
+      <img
+        style={{ marginLeft: 15 }}
+        src={src}
+        width={100}
+        height={100}
+        onClick={next}
+        key={id}
+      />
+    );
+  }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        flexDirection: "row",
+        display: "flex",
+      }}
+    >
       {modalOpen && <MediaModal {...props} close={() => setModalOpen(false)} />}
       {mediaData.length > 0 && (
         <>
-          {mediaData.length}
           <IconButton onClick={() => setModalOpen(true)}>
+            <Typography sx={{ fontSize: 13, marginRight: 1 }}>
+              {mediaData.length}
+            </Typography>
             <PlayCircleIcon />
           </IconButton>
         </>
       )}
+      {preview}
     </Box>
   );
 };

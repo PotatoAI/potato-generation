@@ -1,12 +1,8 @@
 import React, { useState, useRef, MutableRefObject } from "react";
 import {
   useAllRequestsQuery,
-  useAllImagesQuery,
-  useAllVideosQuery,
   useDoActionMutation,
   RequestSortEnum,
-  ImageSortEnum,
-  VideoSortEnum,
 } from "./generated/graphql";
 import { DataGrid, GridColDef, GridRowId } from "@mui/x-data-grid";
 
@@ -131,6 +127,7 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
     },
     {
       field: "images",
+      width: 230,
       renderCell: (p) => {
         const data = p.row.images.edges.map(
           (i: { node: { oid: number; id: number } }) => i.node
