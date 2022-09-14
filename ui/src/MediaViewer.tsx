@@ -269,7 +269,7 @@ export const MediaViewer = (props: Props) => {
   const [current, setCurrent] = useState(0);
 
   const next = () => {
-    setCurrent((c) => (c < mediaData.length ? c + 1 : 0));
+    setCurrent((c) => (c < mediaData.length - 1 ? c + 1 : 0));
   };
 
   let preview = <span></span>;
@@ -277,12 +277,13 @@ export const MediaViewer = (props: Props) => {
   if (kind === "image" && mediaData.length > 0) {
     const id = mediaData[current].id;
     const src = `${prefix}/image/lq/${id}`;
+    const size = 100;
     preview = (
       <img
         style={{ marginLeft: 15 }}
         src={src}
-        width={100}
-        height={100}
+        width={size}
+        height={size}
         onClick={next}
         key={id}
       />
