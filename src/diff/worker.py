@@ -184,7 +184,7 @@ class Worker:
             fname = f"{img_folder}/{i}.png"
             with open(fname, 'wb') as fb:
                 info(f"Writing {fname}")
-                fb.write(read_binary_file(f.oid))
+                fb.write(read_binary_file(f.hqoid or f.oid))
 
         os.system(command)
         save_video(out, req.id)

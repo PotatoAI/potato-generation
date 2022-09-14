@@ -15,8 +15,6 @@ class Upscaler:
         os.makedirs(img_folder, exist_ok=True)
 
         for image in request.images:
-            info(f"Image OID {image.oid}")
-
             fname = f"{self.runtime_path}/input.png"
             with open(fname, 'wb') as fb:
                 info(f"Writing {fname}")
