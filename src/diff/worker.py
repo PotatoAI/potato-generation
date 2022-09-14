@@ -49,6 +49,7 @@ class Worker:
             data = msg.data.decode()
             task = BaseTask(**json.loads(data))
             info(f"Task: {task.json()}")
+            await msg.ack()
             try:
                 if task.kind == 'diffusion':
                     self.diffusion(task.request_id)
@@ -57,32 +58,28 @@ class Worker:
             except Exception as e:
                 error(e)
                 traceback.print_exc()
-            finally:
-                await msg.ack()
 
         async def video_cb(msg):
             data = msg.data.decode()
             task = GenVideoTask(**json.loads(data))
             info(f"Task: {task.json()}")
+            await msg.ack()
             try:
                 self.make_video(task.request_id)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
-            finally:
-                await msg.ack()
 
         async def audio_cb(msg):
             data = msg.data.decode()
             task = AddAudioTask(**json.loads(data))
             info(f"Task: {task.json()}")
+            await msg.ack()
             try:
                 self.add_audio(task.video_id, task.file_path)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
-            finally:
-                await msg.ack()
 
         if self.task_kind == 'diffusion' or self.task_kind == 'upscale':
             await js.subscribe(queue, queue, cb=base_cb)
