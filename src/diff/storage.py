@@ -1,4 +1,4 @@
-from diff.schema import Request, Task, Image, Video
+from diff.schema import Request, Image, Video
 from diff.messages import BaseTask
 from sqlalchemy import desc
 from logging import info, error
