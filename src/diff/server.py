@@ -17,18 +17,37 @@ app.add_url_rule(
     ),
 )
 
+
 def try_parse_int(s: str) -> int:
     if s.isdigit():
         return int(s)
     else:
         return real_id(s)
 
+
 @app.route("/image/<id>")
-def image(id):
+def image_best(id):
     data = get_image_data(try_parse_int(id))
     resp = Response(data)
     resp.headers['Content-Type'] = 'image/png'
     return resp
+
+
+@app.route("/image/hq/<id>")
+def image_hq(id):
+    data = get_image_data(try_parse_int(id), quality='hq')
+    resp = Response(data)
+    resp.headers['Content-Type'] = 'image/png'
+    return resp
+
+
+@app.route("/image/lq/<id>")
+def image_lq(id):
+    data = get_image_data(try_parse_int(id), quality='lq')
+    resp = Response(data)
+    resp.headers['Content-Type'] = 'image/png'
+    return resp
+
 
 @app.route("/video/<id>")
 def video(id):

@@ -170,9 +170,16 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
     ).all()
 
 
-def get_image_data(id: int) -> bytearray:
+def get_image_data(id: int, quality: str = 'best') -> bytearray:
     image = db_session.query(Image).filter(Image.id == id).one()
-    return read_binary_file(image.hqoid or image.oid)
+
+    oid = image.hqoid or image.oid
+    if quality == 'best':
+        oid = image.hqoid or image.oid
+    if quality == 'hq':
+        oid = image.hqoid
+
+    return read_binary_file(oid)
 
 
 def get_video_data(id: int) -> bytearray:

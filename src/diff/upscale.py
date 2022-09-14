@@ -15,6 +15,10 @@ class Upscaler:
         os.makedirs(img_folder, exist_ok=True)
 
         for image in request.images:
+            if image.hqoid:
+                info(f"Skipping {image.id} since it has HQ version")
+                continue
+
             fname = f"{self.runtime_path}/input.png"
             with open(fname, 'wb') as fb:
                 info(f"Writing {fname}")
@@ -24,12 +28,12 @@ class Upscaler:
             info(command)
             os.system(command)
 
-            img_out_fname = f"{image.id}.png"
+            img_out_fname = f"{image.id}-hq.png"
             img = f"{img_folder}/{img_out_fname}"
-            command = f"cp {self.runtime_path}/output.png {img}"
+            command = f"cp -f {self.runtime_path}/output.png {img}"
             info(command)
             os.system(command)
 
-            image.hqoid = save_binary_file(fname)
-            info(f"Saved HQ version of image#{image.id}")
+            image.hqoid = save_binary_file(img)
+            info(f"Saved HQ version of image#{image.id} -> {image.hqoid}")
             commit()
