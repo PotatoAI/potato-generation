@@ -129,6 +129,7 @@ export type Query = {
   allImages?: Maybe<ImageConnection>;
   allRequests?: Maybe<RequestConnection>;
   allVideos?: Maybe<VideoConnection>;
+  imagesById?: Maybe<Array<Maybe<Image>>>;
   inputFiles?: Maybe<Array<Maybe<Scalars['String']>>>;
   largeObjects?: Maybe<Array<Maybe<LargeObject>>>;
   node?: Maybe<Node>;
@@ -159,6 +160,11 @@ export type QueryAllVideosArgs = {
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<Array<InputMaybe<VideoSortEnum>>>;
+};
+
+
+export type QueryImagesByIdArgs = {
+  imageIds?: InputMaybe<Array<Scalars['String']>>;
 };
 
 
@@ -296,6 +302,8 @@ export type AllRequestsQuery = { __typename?: 'Query', allRequests?: { __typenam
 
 export type AllImagesQueryVariables = Exact<{
   sort?: InputMaybe<Array<InputMaybe<ImageSortEnum>> | InputMaybe<ImageSortEnum>>;
+  first?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -337,6 +345,13 @@ export type InputFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type InputFilesQuery = { __typename?: 'Query', inputFiles?: Array<string | null> | null };
+
+export type ImagesByIdQueryVariables = Exact<{
+  imageIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+}>;
+
+
+export type ImagesByIdQuery = { __typename?: 'Query', imagesById?: Array<{ __typename?: 'Image', id: string, filename?: string | null, selected?: boolean | null, createdOn?: any | null, updatedOn?: any | null, requestId?: number | null, oid?: any | null, hqoid?: any | null } | null> | null };
 
 
 export const AllRequestsDocument = gql`
@@ -380,8 +395,8 @@ export function useAllRequestsQuery(options?: Omit<Urql.UseQueryArgs<AllRequests
   return Urql.useQuery<AllRequestsQuery, AllRequestsQueryVariables>({ query: AllRequestsDocument, ...options });
 };
 export const AllImagesDocument = gql`
-    query AllImages($sort: [ImageSortEnum]) {
-  allImages(sort: $sort) {
+    query AllImages($sort: [ImageSortEnum], $first: Int, $after: String) {
+  allImages(sort: $sort, first: $first, after: $after) {
     edges {
       node {
         id
@@ -466,4 +481,22 @@ export const InputFilesDocument = gql`
 
 export function useInputFilesQuery(options?: Omit<Urql.UseQueryArgs<InputFilesQueryVariables>, 'query'>) {
   return Urql.useQuery<InputFilesQuery, InputFilesQueryVariables>({ query: InputFilesDocument, ...options });
+};
+export const ImagesByIdDocument = gql`
+    query ImagesById($imageIds: [String!]) {
+  imagesById(imageIds: $imageIds) {
+    id
+    filename
+    selected
+    createdOn
+    updatedOn
+    requestId
+    oid
+    hqoid
+  }
+}
+    `;
+
+export function useImagesByIdQuery(options?: Omit<Urql.UseQueryArgs<ImagesByIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<ImagesByIdQuery, ImagesByIdQueryVariables>({ query: ImagesByIdDocument, ...options });
 };

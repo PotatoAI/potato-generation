@@ -85,11 +85,19 @@ async def add_new_request(
     return req
 
 
-def select_images(ids: List[int]):
+def set_select_images(ids: List[int], v: bool):
     imgs = db_session.query(Image).filter(Image.id.in_(ids)).all()
     for img in imgs:
-        img.selected = True
+        img.selected = v
     db_session.commit()
+
+
+def select_images(ids: List[int]):
+    set_select_images(ids, True)
+
+
+def deselect_images(ids: List[int]):
+    set_select_images(ids, False)
 
 
 def approve_requests(ids: List[int]):
@@ -165,6 +173,10 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
         Image.request_id == rid,
         Image.selected == True,
     ).all()
+
+
+def get_images(ids: List[int]) -> List[Image]:
+    return db_session.query(Image).filter(Image.id.in_(ids)).all()
 
 
 def get_image_data(id: int, quality: str = 'best') -> bytearray:

@@ -14,7 +14,7 @@ from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Image as ImageModel, Video as VideoModel
 from diff.messages import GenVideoTask, AddAudioTask
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, schedule_request, select_images, read_binary_file, get_request, schedule_task
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, schedule_request, deselect_images, select_images, read_binary_file, get_request, schedule_task, get_images
 from diff.config import config
 from base64 import b64decode
 from typing import List
@@ -78,6 +78,15 @@ class Query(graphene.ObjectType):
     all_requests = SQLAlchemyConnectionField(Request.connection)
     all_images = SQLAlchemyConnectionField(Image.connection)
     all_videos = SQLAlchemyConnectionField(Video.connection)
+
+    images_by_id = graphene.List(Image,
+                                 image_ids=graphene.List(
+                                     graphene.NonNull(graphene.String)))
+
+    def resolve_images_by_id(self, info, image_ids) -> List[ImageModel]:
+        real_ids = list(map(real_id, image_ids))
+        print(real_ids)
+        return get_images(real_ids)
 
 
 async def mutate_async(info, prompt, count) -> RequestModel:
@@ -159,6 +168,10 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
 
     if action == 'select' and model == 'image':
         select_images(real_ids)
+        return ok
+
+    if action == 'deselect' and model == 'image':
+        deselect_images(real_ids)
         return ok
 
     logging.error(f"Unknown action {action} for model {model}")

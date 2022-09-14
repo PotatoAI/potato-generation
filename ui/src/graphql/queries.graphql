@@ -34,8 +34,8 @@ query AllRequests($sort: [RequestSortEnum]) {
 }
 
 
-query AllImages($sort: [ImageSortEnum]) {
-  allImages(sort: $sort) {
+query AllImages($sort: [ImageSortEnum], $first: Int, $after: String) {
+  allImages(sort: $sort, first: $first, after: $after) {
     edges {
       node {
         id,
@@ -90,4 +90,17 @@ mutation DoAction($ids: [String!], $action: String!, $model: String!, $metadata:
 
 query InputFiles {
   inputFiles
+}
+
+query ImagesById($imageIds: [String!]) {
+  imagesById(imageIds: $imageIds) {
+    id,
+    filename,
+    selected,
+    createdOn,
+    updatedOn,
+    requestId,
+    oid,
+    hqoid,
+  }
 }

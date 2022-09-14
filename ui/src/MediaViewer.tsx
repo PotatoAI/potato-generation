@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useDoActionMutation, useInputFilesQuery } from "./generated/graphql";
+import {
+  useDoActionMutation,
+  useInputFilesQuery,
+  useImagesByIdQuery,
+} from "./generated/graphql";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -80,17 +84,40 @@ const ExtraControlsVideo = (props: { id: string }) => {
 const ExtraControlsImage = (props: { id: string }) => {
   const { id } = props;
   const [actionResult, action] = useDoActionMutation();
+  const [imageDetails, refresh] = useImagesByIdQuery({
+    variables: { imageIds: [id] },
+    requestPolicy: "network-only",
+  });
+
+  const isSelected = imageDetails.data?.imagesById?.some(
+    (img) => img?.selected
+  );
 
   const select = async () => {
     await action({ ids: [id], action: "select", model: "image", metadata: [] });
+    await refresh();
+  };
+
+  const deselect = async () => {
+    await action({
+      ids: [id],
+      action: "deselect",
+      model: "image",
+      metadata: [],
+    });
+    await refresh();
   };
 
   const loader = <ChaoticOrbit size={25} speed={1.5} color="white" />;
+  const label = isSelected ? "Deselect" : "Select";
 
   return (
     <Box>
-      <Button color="success" onClick={select}>
-        {actionResult.fetching ? loader : "Select"}
+      <Button
+        color={isSelected ? "warning" : "success"}
+        onClick={isSelected ? deselect : select}
+      >
+        {actionResult.fetching ? loader : label}
       </Button>
     </Box>
   );
