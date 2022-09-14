@@ -13,8 +13,8 @@ from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Task as TaskModel, Image as ImageModel, Video as VideoModel
-from diff.worker import SlideshowWorker
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file, get_request
+from diff.messages import GenVideoTask, AddAudioTask
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_tasks, delete_images, delete_videos, schedule_request, reschedule_tasks, select_images, read_binary_file, get_request, schedule_task
 from diff.config import config
 from base64 import b64decode
 from typing import List
@@ -29,28 +29,24 @@ def real_id(hx: str) -> int:
 
 
 class Request(SQLAlchemyObjectType):
-
     class Meta:
         model = RequestModel
         interfaces = (relay.Node, )
 
 
 class Task(SQLAlchemyObjectType):
-
     class Meta:
         model = TaskModel
         interfaces = (relay.Node, )
 
 
 class Image(SQLAlchemyObjectType):
-
     class Meta:
         model = ImageModel
         interfaces = (relay.Node, )
 
 
 class Video(SQLAlchemyObjectType):
-
     class Meta:
         model = VideoModel
         interfaces = (relay.Node, )
@@ -92,7 +88,6 @@ class Query(graphene.ObjectType):
 
 
 class CreateRequest(graphene.Mutation):
-
     class Arguments:
         prompt = graphene.String()
         count = graphene.Int()
@@ -119,13 +114,15 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
         return ok
 
     if action == 'generate-video' and model == 'request':
-        worker = SlideshowWorker(config().video)
-        worker.generate(real_ids)
+        for rid in real_ids:
+            task = GenVideoTask(request_id=rid)
+            await schedule_task(nc, "video", task)
         return ok
 
     if action == 'add-audio' and model == 'video':
-        worker = SlideshowWorker(config().video)
-        worker.add_audio(real_ids, metadata)
+        for vid in real_ids:
+            task = AddAudioTask(video_id=vid, file_path=metadata[0])
+            await schedule_task(nc, "audio", task)
         return ok
 
     if action == 'delete':
@@ -177,7 +174,6 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
 
 
 class DoAction(graphene.Mutation):
-
     class Arguments:
         ids = graphene.List(graphene.NonNull(graphene.String))
         action = graphene.NonNull(graphene.String)

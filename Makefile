@@ -12,6 +12,12 @@ worker-upscale: config.yaml BSRGAN
 worker-diffusion: config.yaml
 	$(MAIN) worker --task-kind diffusion
 
+worker-video: config.yaml
+	$(MAIN) worker --task-kind video
+
+worker-audio: config.yaml
+	$(MAIN) worker --task-kind audio
+
 worker-until-done: config.yaml
 	$(MAIN) worker --until-done --task-kind diffusion
 

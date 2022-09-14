@@ -50,16 +50,18 @@ def commit():
     db_session.commit()
 
 
-async def schedule_request(nc, rid: int, kind: str = "diffusion"):
-    task = BaseTask(request_id=rid, kind=kind)
+async def schedule_task(nc, kind: str, task):
     queue = f"tasks-{kind}"
-    info(f"Scheduling task {task.json()} to {queue}")
     js = nc.jetstream()
-    print(nc)
-    print(js)
-    await js.add_stream(name="worker-stream", subjects=[queue])
+    await js.add_stream(name=f"worker-stream-{queue}", subjects=[queue])
+    info(f"Scheduling task {task.json()} to {queue}")
     ack = await js.publish(queue, task.json().encode())
     info(ack)
+
+
+async def schedule_request(nc, rid: int, kind: str = "diffusion"):
+    task = BaseTask(request_id=rid, kind=kind)
+    schedule_task(nc, queue, task)
 
 
 async def add_new_request(
@@ -139,24 +141,6 @@ def delete_videos(ids: List[int]):
         finally:
             db_session.delete(rec)
     db_session.commit()
-
-
-def query_top_tasks(kind: str):
-    return db_session.query(Task, Request).filter(
-        Task.request_id == Request.id,
-        Task.running == False,
-        Task.status == 'new',
-        Request.approved == True,
-        Task.kind == kind,
-    ).order_by(desc(Task.priority)).order_by(Task.created_on)
-
-
-def has_top_task(kind: str) -> int:
-    return query_top_tasks(kind).count()
-
-
-def get_top_task(kind) -> Task:
-    return query_top_tasks(kind).limit(1).one()
 
 
 def save_image(fname: str, rid: int, tid: int):

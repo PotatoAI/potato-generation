@@ -19,6 +19,7 @@ def worker(args):
         output_dir=args.output_folder,
         gen_config=config().gen,
         nats_config=config().nats,
+        video_config=config().video,
         dry_run=args.dry_run,
         until_done=args.until_done,
         task_kind=args.task_kind,

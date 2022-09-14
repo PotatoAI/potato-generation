@@ -10,8 +10,8 @@ from typing import List
 from diff.config import GenConfig, NatsConfig, VideoConfig
 from diff.gen import Generator
 from diff.upscale import Upscaler
-from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
-from diff.messages import BaseTask
+from diff.storage import save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
+from diff.messages import BaseTask, GenVideoTask, AddAudioTask
 from logging import info, error
 from dataclasses import dataclass
 
@@ -21,6 +21,7 @@ class Worker:
     output_dir: str
     gen_config: GenConfig
     nats_config: NatsConfig
+    video_config: VideoConfig
     dry_run: bool = False
     until_done: bool = False
     task_kind: str = 'diffusion'
@@ -36,19 +37,56 @@ class Worker:
         await self.nats_connect()
         queue = self.queue()
         js = self.nc.jetstream()
-        await js.add_stream(name="worker-stream", subjects=[queue])
+        await js.add_stream(name=f"worker-stream-{queue}", subjects=[queue])
 
-        async def cb(msg):
+        async def base_cb(msg):
             data = msg.data.decode()
             task = BaseTask(**json.loads(data))
             info(f"Task: {task.json()}")
-            if task.kind == 'diffusion':
-                self.diffusion(task.request_id)
-            if task.kind == 'upscale':
-                self.upscale(task.request_id)
-            await msg.ack()
+            try:
+                if task.kind == 'diffusion':
+                    self.diffusion(task.request_id)
+                if task.kind == 'upscale':
+                    self.upscale(task.request_id)
+            except Exception as e:
+                error(e)
+                traceback.print_exc()
+            finally:
+                await msg.ack()
 
-        await js.subscribe(queue, f"worker-{self.task_kind}", cb=cb)
+        async def video_cb(msg):
+            data = msg.data.decode()
+            task = GenVideoTask(**json.loads(data))
+            info(f"Task: {task.json()}")
+            try:
+                self.make_video(task.request_id)
+            except Exception as e:
+                error(e)
+                traceback.print_exc()
+            finally:
+                await msg.ack()
+
+        async def audio_cb(msg):
+            data = msg.data.decode()
+            task = AddAudioTask(**json.loads(data))
+            info(f"Task: {task.json()}")
+            try:
+                self.add_audio(task.video_id, task.file_path)
+            except Exception as e:
+                error(e)
+                traceback.print_exc()
+            finally:
+                await msg.ack()
+
+        if self.task_kind == 'diffusion' or self.task_kind == 'upscale':
+            await js.subscribe(queue, queue, cb=base_cb)
+
+        if self.task_kind == 'video':
+            await js.subscribe(queue, queue, cb=video_cb)
+
+        if self.task_kind == 'audio':
+            await js.subscribe(queue, queue, cb=audio_cb)
+
         info(f"Started loop for {queue}")
 
     def run(self):
@@ -111,24 +149,12 @@ class Worker:
         finally:
             commit()
 
-
-class SlideshowWorker:
-
-    def __init__(self, config: VideoConfig):
-        self.config = config
-
-    def run(self):
-        print('yeah, sure')
-
-    def generate(self, ids: List[int]):
-        for id in ids:
-            self.generate_one(id)
-
-    def generate_one(self, id: int):
-        print(f"gen for {id}")
-        req = get_request(id)
+    def make_video(self, rid: int):
+        req = get_request(rid)
         print(req)
         images = get_selected_images_for_request(req.id)
+        print(f"Video generation for {rid} \"{req.prompt}\"")
+
         cnt = len(images)
         print(cnt)
         folder = "output/videos"
@@ -137,12 +163,12 @@ class SlideshowWorker:
         os.makedirs(img_folder, exist_ok=True)
 
         d = " \\\n"
-        out = f"{folder}/{id}.mp4"
+        out = f"{folder}/{rid}.mp4"
 
         loop_section = d.join(
             map(lambda i: f"-loop 1 -t 3 -i {img_folder}/{i}.png", range(cnt)))
 
-        fpp = self.config.frames_per_pic
+        fpp = self.video_config.frames_per_pic
 
         filter_section = d.join(
             map(
@@ -168,19 +194,17 @@ class SlideshowWorker:
         os.system(command)
         save_video(out, req.id)
 
-    def add_audio(self, vid: List[int], metadata: List[str]):
-        vids = get_videos(vid)
-        audio_file = metadata[0]
+    def add_audio(self, vid: int, audio_file: str):
+        vid = get_videos([vid])[0]
         folder = "output/videos"
         os.makedirs(folder, exist_ok=True)
-        for vid in vids:
-            out = f"{folder}/{uuid.uuid1()}.mp4"
-            command = f"ffmpeg -i {vid.filename} -i {audio_file} -map 0:v -map 1:a -c:v copy -shortest {out}"
-            info(command)
+        out = f"{folder}/{uuid.uuid1()}.mp4"
+        command = f"ffmpeg -i {vid.filename} -i {audio_file} -map 0:v -map 1:a -c:v copy -shortest {out}"
+        info(command)
 
-            with open(vid.filename, 'wb') as fb:
-                info(f"Writing {vid.filename}")
-                fb.write(read_binary_file(vid.oid))
+        with open(vid.filename, 'wb') as fb:
+            info(f"Writing {vid.filename}")
+            fb.write(read_binary_file(vid.oid))
 
-            os.system(command)
-            save_video(out, vid.request.id)
+        os.system(command)
+        save_video(out, vid.request.id)

@@ -12,7 +12,6 @@ class GenVideoTask(BaseModel):
 
 
 class AddAudioTask(BaseModel):
-    request_id: int
     video_id: int
     file_path: str
     kind: str = 'add-audio'
