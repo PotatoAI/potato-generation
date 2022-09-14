@@ -16,6 +16,12 @@ from logging import info, error
 from dataclasses import dataclass
 
 
+def resize_img(in_file: str, out_file: str, scale: str = "512x512"):
+    command = f"convert -resize {scale} {in_file} {out_file}"
+    info(command)
+    os.system(command)
+
+
 @dataclass
 class Worker:
     output_dir: str
@@ -185,6 +191,11 @@ class Worker:
             with open(fname, 'wb') as fb:
                 info(f"Writing {fname}")
                 fb.write(read_binary_file(f.hqoid or f.oid))
+            resize_img(fname, fname, self.video_config.scale)
+
+        # FOR DEBUGGING
+        # with open("slideshow.sh", "w") as f:
+        #     f.write(command)
 
         os.system(command)
         save_video(out, req.id)

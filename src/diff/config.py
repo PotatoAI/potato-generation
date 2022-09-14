@@ -26,6 +26,7 @@ class GenConfig(BaseModel):
 
 class VideoConfig(BaseModel):
     frames_per_pic: int
+    scale: str
 
 
 class NatsConfig(BaseModel):
