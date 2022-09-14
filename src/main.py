@@ -90,6 +90,12 @@ parser_worker.add_argument(
     default='diffusion',
 )
 
+parser_worker.add_argument(
+    '--output-folder',
+    help='Folder to dump results',
+    default='output',
+)
+
 parser_worker.set_defaults(func=worker)
 parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
