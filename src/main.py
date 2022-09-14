@@ -3,7 +3,6 @@ import diff.schema
 import diff.graphql
 from diff.login import login
 from diff.worker import Worker
-from diff.storage import add_new_request
 from diff.config import config
 
 import argparse
@@ -25,10 +24,6 @@ def worker(args):
         task_kind=args.task_kind,
     )
     worker.run()
-
-
-def request(args):
-    asyncio.run(add_new_request(args.prompt, priority=10))
 
 
 def migrate(args):
@@ -72,17 +67,10 @@ parser.add_argument(
     '--dry-run',
     help='Simulate generation without actually genarting anything',
     action=argparse.BooleanOptionalAction)
-parser.add_argument(
-    '--output-folder',
-    help='Prompt to use for one time generation',
-    nargs='?',
-    default='output',
-)
 
 subparsers = parser.add_subparsers(help='sub-command help')
 
 parser_worker = subparsers.add_parser('worker', help='Run worker')
-parser_request = subparsers.add_parser('request', help='Run prompt once')
 parser_migrate = subparsers.add_parser('migrate', help='Run migrate')
 parser_repl = subparsers.add_parser('repl', help='Drop into REPL')
 parser_server = subparsers.add_parser('server', help='Run Flask server')
@@ -102,15 +90,7 @@ parser_worker.add_argument(
     default='diffusion',
 )
 
-parser_request.add_argument(
-    '--prompt',
-    help='Prompt to schedule a task',
-    nargs='?',
-    default='Cute cat',
-)
-
 parser_worker.set_defaults(func=worker)
-parser_request.set_defaults(func=request)
 parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
 parser_server.set_defaults(func=server)

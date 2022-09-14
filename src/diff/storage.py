@@ -71,9 +71,6 @@ async def add_new_request(
     kind: str = "diffusion",
     priority=0,
 ):
-    if not prompt:
-        prompt = input("Enter prompt: ")
-
     req = Request(
         prompt=prompt,
         priority=priority,
