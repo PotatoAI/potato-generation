@@ -3,32 +3,54 @@ import os
 import socket
 import uuid
 import traceback
+import asyncio
+import nats
 from typing import List
-from diff.config import GenConfig, VideoConfig
+from diff.config import GenConfig, NatsConfig, VideoConfig
 from diff.gen import Generator
 from diff.upscale import Upscaler
 from diff.storage import get_top_task, has_top_task, save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
+from diff.messages import BaseTask
 from logging import info, error
+from dataclasses import dataclass
 
 
+@dataclass
 class Worker:
-    def __init__(
-        self,
-        output_dir: str,
-        gen_config: GenConfig,
-        dry_run=False,
-        until_done=False,
-        task_kind='diffusion',
-    ):
-        self.task_kind = task_kind
-        self.output_dir = output_dir
-        self.config = gen_config
-        self.dry_run = dry_run
-        self.until_done = until_done
-        self.generator = Generator() if self.task_kind == 'diffusion' else None
-        self.upscaler = Upscaler() if self.task_kind == 'upscale' else None
+    output_dir: str
+    gen_config: GenConfig
+    nats_config: NatsConfig
+    dry_run: bool = False
+    until_done: bool = False
+    task_kind: str = 'diffusion'
+
+    def queue(self) -> str:
+        return f"tasks-{self.task_kind}"
+
+    async def nats_connect(self):
+        info("Connecting to NATS")
+        self.nc = await nats.connect(self.nats_config.url())
+
+    async def loop(self):
+        await self.nats_connect()
+        queue = self.queue()
+        js = self.nc.jetstream()
+        await js.add_stream(name="worker-stream", subjects=[queue])
+        info(f"Started loop for {queue}")
+
+        # generator = Generator()
+        # upscaler = Upscaler()
+        psub = await js.pull_subscribe(queue, "psub")
+
+        while True:
+            msgs = await psub.fetch(1)
+            for msg in msgs:
+                info(msg)
 
     def run(self):
+        asyncio.run(self.loop())
+
+    def tmp(self):
         while True:
             avaliable_tasks = has_top_task(self.task_kind)
             info(f"{avaliable_tasks} Tasks in queue")
@@ -89,6 +111,7 @@ class Worker:
 
 
 class SlideshowWorker:
+
     def __init__(self, config: VideoConfig):
         self.config = config
 

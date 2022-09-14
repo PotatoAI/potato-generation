@@ -28,22 +28,37 @@ class VideoConfig(BaseModel):
     frames_per_pic: int
 
 
+class NatsConfig(BaseModel):
+    host: str
+    port: int
+    user: Optional[str]
+    password: Optional[str]
+
+    def url(self):
+        return f"nats://{self.user}:{self.password}@{self.host}:{self.port}"
+
+
 class Config(BaseModel):
     hf: HuggingConfig
     db: DBConfig
     gen: GenConfig
     video: VideoConfig
+    nats: NatsConfig
+
 
 global_config: Config
+
 
 def init_config(fname: str):
     info(f"Reading config from {fname}")
     global global_config
     global_config = read(fname)
 
+
 def config() -> Config:
     global global_config
     return global_config
+
 
 def read(fname: str) -> Config:
     with open(fname, 'r') as stream:

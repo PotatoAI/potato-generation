@@ -11,6 +11,13 @@ services:
       - '6970:5432'
     volumes:
       - db:/var/lib/postgresql/potatoai-data
+  nats:
+    image: 'nats:latest'
+    command: "-DV -js --user thisisnats --pass f1f18a162944a3b"
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    hostname: nats-server
 volumes:
   db:
     driver: local

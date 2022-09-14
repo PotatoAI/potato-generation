@@ -480,6 +480,17 @@ python-versions = ">=3.5"
 traitlets = "*"
 
 [[package]]
+name = "nats-py"
+version = "2.1.7"
+description = "NATS client for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+nkeys = ["nkeys"]
+
+[[package]]
 name = "numpy"
 version = "1.23.2"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -932,7 +943,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.12"
-content-hash = "9ed3e6893c3a02589fe9678a6053259eebf9fd933a3f0adb67dc06c5376cb0fe"
+content-hash = "5c716caef5fd9bc5429c35656e3fb4db3f7426af60578c481dabaea0e98e71f4"
 
 [metadata.files]
 alembic = [
@@ -1159,6 +1170,9 @@ markupsafe = [
 matplotlib-inline = [
     {file = "matplotlib-inline-0.1.6.tar.gz", hash = "sha256:f887e5f10ba98e8d2b150ddcf4702c1e5f8b3a20005eb0f74bfdbd360ee6f304"},
     {file = "matplotlib_inline-0.1.6-py3-none-any.whl", hash = "sha256:f1f41aab5328aa5aaea9b16d083b128102f8712542f819fe7e6a420ff581b311"},
+]
+nats-py = [
+    {file = "nats-py-2.1.7.tar.gz", hash = "sha256:e26e2c8be52e7f76c3f701d5d7d4b0935e52b17c97b2e01ab9275d4c71423c41"},
 ]
 numpy = [
     {file = "numpy-1.23.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:e603ca1fb47b913942f3e660a15e55a9ebca906857edfea476ae5f0fe9b457d5"},

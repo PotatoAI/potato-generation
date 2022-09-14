@@ -7,6 +7,7 @@ import logging
 import diff.db
 import logging
 import base64
+import asyncio
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
@@ -104,6 +105,75 @@ class CreateRequest(graphene.Mutation):
         return CreateRequest(request=request, ok=ok)
 
 
+async def do_action_async(info, ids, action, model, metadata) -> bool:
+    ok = True
+
+    real_ids = list(map(real_id, ids))
+
+    logging.info(f"Running {action} action on {model} {real_ids}")
+
+    if action == 'approve' and model == 'request':
+        approve_requests(real_ids)
+        return ok
+
+    if action == 'generate-video' and model == 'request':
+        worker = SlideshowWorker(config().video)
+        worker.generate(real_ids)
+        return ok
+
+    if action == 'add-audio' and model == 'video':
+        worker = SlideshowWorker(config().video)
+        worker.add_audio(real_ids, metadata)
+        return ok
+
+    if action == 'delete':
+        if model == 'request':
+            delete_requests(real_ids)
+            return ok
+        if model == 'task':
+            delete_tasks(real_ids)
+            return ok
+        if model == 'image':
+            delete_images(real_ids)
+            return ok
+        if model == 'video':
+            delete_videos(real_ids)
+            return ok
+
+    if action == 'copy' and model == 'request':
+        for rid in real_ids:
+            request = get_request(rid)
+            count = 5
+            if len(metadata) > 0 and metadata[0]:
+                count = int(metadata[0])
+            await add_new_request(request.prompt, count=count)
+
+    if action == 'upscale' and model == 'request':
+        for rid in real_ids:
+            await schedule_request(rid, kind='upscale')
+        return ok
+
+    if action == 're-run':
+        if model == 'request':
+            count = 1
+            if len(metadata) > 0 and metadata[0]:
+                count = int(metadata[0])
+            for _ in range(count):
+                for rid in real_ids:
+                    await schedule_request(rid, kind='diffusion')
+            return ok
+        if model == 'task':
+            await reschedule_tasks(real_ids)
+            return ok
+
+    if action == 'select' and model == 'image':
+        select_images(real_ids)
+        return ok
+
+    logging.error(f"Unknown action {action} for model {model}")
+    return False
+
+
 class DoAction(graphene.Mutation):
 
     class Arguments:
@@ -115,72 +185,8 @@ class DoAction(graphene.Mutation):
     ok = graphene.Boolean()
 
     def mutate(self, info, ids, action, model, metadata):
-        ok = DoAction(ok=True)
-
-        real_ids = list(map(real_id, ids))
-
-        logging.info(f"Running {action} action on {model} {real_ids}")
-
-        if action == 'approve' and model == 'request':
-            approve_requests(real_ids)
-            return ok
-
-        if action == 'generate-video' and model == 'request':
-            worker = SlideshowWorker(config().video)
-            worker.generate(real_ids)
-            return ok
-
-        if action == 'add-audio' and model == 'video':
-            worker = SlideshowWorker(config().video)
-            worker.add_audio(real_ids, metadata)
-            return ok
-
-        if action == 'delete':
-            if model == 'request':
-                delete_requests(real_ids)
-                return ok
-            if model == 'task':
-                delete_tasks(real_ids)
-                return ok
-            if model == 'image':
-                delete_images(real_ids)
-                return ok
-            if model == 'video':
-                delete_videos(real_ids)
-                return ok
-
-        if action == 'copy' and model == 'request':
-            for rid in real_ids:
-                request = get_request(rid)
-                count = 5
-                if len(metadata) > 0 and metadata[0]:
-                    count = int(metadata[0])
-                add_new_request(request.prompt, count=count)
-
-        if action == 'upscale' and model == 'request':
-            for rid in real_ids:
-                schedule_request(rid, kind='upscale')
-            return ok
-
-        if action == 're-run':
-            if model == 'request':
-                count = 1
-                if len(metadata) > 0 and metadata[0]:
-                    count = int(metadata[0])
-                for _ in range(count):
-                    for rid in real_ids:
-                        schedule_request(rid)
-                return ok
-            if model == 'task':
-                reschedule_tasks(real_ids)
-                return ok
-
-        if action == 'select' and model == 'image':
-            select_images(real_ids)
-            return ok
-
-        logging.error(f"Unknown action {action} for model {model}")
-        return DoAction(ok=False)
+        ok = asyncio.run(do_action_async(info, ids, action, model, metadata))
+        return DoAction(ok=ok)
 
 
 class Mutation(graphene.ObjectType):

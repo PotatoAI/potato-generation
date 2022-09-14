@@ -1,14 +1,18 @@
 from diff.schema import Request, Task, Image, Video
+from diff.messages import BaseTask
 from sqlalchemy import desc
 from logging import info, error
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.engine import Engine
-from diff.config import DBConfig
+from diff.config import DBConfig, NatsConfig
 from typing import List
 import diff.db
+import nats
+import asyncio
 
 db_engine: Engine
 db_session: scoped_session
+nc: nats.aio.client.Client
 
 
 def save_binary_file(fname: str) -> int:
@@ -35,6 +39,15 @@ def delete_binary_file(oid: int) -> bytearray:
     conn.close()
 
 
+def connect_nats(cfg: NatsConfig):
+
+    async def init_nats(cfg: NatsConfig):
+        global nc
+        nc = await nats.connect(cfg.url())
+
+    asyncio.run(init_nats(cfg))
+
+
 def init_db_session(cfg: DBConfig):
     info("Initializing db session")
     global db_engine
@@ -47,18 +60,18 @@ def commit():
     db_session.commit()
 
 
-def schedule_request(rid: int, priority: int = 0, kind: str = "diffusion"):
-    task = Task(
-        request_id=rid,
-        priority=priority,
-        kind=kind,
-    )
-    db_session.add(task)
-    db_session.commit()
-    info(f"Scheduled new task {task.id}")
+async def schedule_request(rid: int, kind: str = "diffusion"):
+    task = BaseTask(request_id=rid, kind=kind)
+    queue = f"tasks-{kind}"
+    info(f"Scheduling task {task.json()} to {queue}")
+    global nc
+    js = nc.jetstream()
+    await js.add_stream(name="worker-stream", subjects=[queue])
+    ack = await js.publish(queue, task.json().encode())
+    info(ack)
 
 
-def add_new_request(
+async def add_new_request(
     prompt: str,
     count: int = 1,
     kind: str = "diffusion",
@@ -77,14 +90,14 @@ def add_new_request(
     db_session.commit()
     info(f"Created new request {req.id}")
     for _ in range(count):
-        schedule_request(req.id, priority, kind=kind)
+        await schedule_request(nc, req.id, priority, kind=kind)
     return req
 
 
-def reschedule_tasks(ids: List[int]):
+async def reschedule_tasks(ids: List[int]):
     tasks = db_session.query(Task).filter(Task.id.in_(ids)).all()
     for task in tasks:
-        schedule_request(task.request_id)
+        await schedule_request(task.request_id)
     db_session.commit()
 
 

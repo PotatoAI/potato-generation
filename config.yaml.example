@@ -4,6 +4,11 @@ db:
   adapter: sqlite
   database: main.db
   echo: true
+nats:
+  host: localhost
+  port: 4222
+  user: user
+  password: pass
 gen:
   inference_steps: 100
   batch_size: 1

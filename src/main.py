@@ -8,6 +8,7 @@ from diff.config import config
 
 import argparse
 import coloredlogs
+import asyncio
 from logging import info, debug
 
 coloredlogs.install(level='INFO')
@@ -17,6 +18,7 @@ def worker(args):
     worker = Worker(
         output_dir=args.output_folder,
         gen_config=config().gen,
+        nats_config=config().nats,
         dry_run=args.dry_run,
         until_done=args.until_done,
         task_kind=args.task_kind,
@@ -25,7 +27,7 @@ def worker(args):
 
 
 def request(args):
-    add_new_request(args.prompt, priority=10)
+    asyncio.run(add_new_request(args.prompt, priority=10))
 
 
 def migrate(args):
@@ -123,6 +125,7 @@ debug(args)
 diff.config.init_config(args.config)
 debug(config())
 diff.storage.init_db_session(config().db)
+diff.storage.connect_nats(config().nats)
 login(config().hf.token)
 
 args.func(args)
