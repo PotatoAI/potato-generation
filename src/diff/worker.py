@@ -45,6 +45,9 @@ class Worker:
     def queue(self) -> str:
         return f"tasks-{self.task_kind}"
 
+    def durable_name(self) -> str:
+        return f"durable-{self.task_kind}"
+
     async def nats_connect(self):
         info("Connecting to NATS")
         self.nc = await nats.connect(self.nats_config.url())
@@ -55,58 +58,59 @@ class Worker:
         js = self.nc.jetstream()
         await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
 
-        async def base_cb(msg):
+        async def base_cb(data):
             await msg.ack()
             data = msg.data.decode()
             task = BaseTask(**json.loads(data))
             info(f"Task in base_cb: {task.json()}")
-            try:
-                if task.kind == 'diffusion':
-                    await self.diffusion(task.request_id)
-                if task.kind == 'upscale':
-                    await self.upscale(task.request_id)
-            except Exception as e:
-                error(e)
-                traceback.print_exc()
-            finally:
-                info(f"Finished {task.json()}")
 
-        async def video_cb(msg):
-            await msg.ack()
-            data = msg.data.decode()
+            if task.kind == 'diffusion':
+                await self.diffusion(task.request_id)
+            if task.kind == 'upscale':
+                await self.upscale(task.request_id)
+
+        async def video_cb(data):
             task = GenVideoTask(**json.loads(data))
             info(f"Task in video_cb: {task.json()}")
-            try:
-                await self.make_video(task.request_id)
-            except Exception as e:
-                error(e)
-                traceback.print_exc()
-            finally:
-                info(f"Finished {task.json()}")
 
-        async def audio_cb(msg):
-            await msg.ack()
-            data = msg.data.decode()
+            await self.make_video(task.request_id)
+
+        async def audio_cb(data):
             task = AddAudioTask(**json.loads(data))
             info(f"Task in audio_cb: {task.json()}")
+            await self.add_audio(task.video_id, task.file_path)
+
+        sub = await js.subscribe(queue, self.durable_name())
+        info(f"Started loop for {queue}")
+        sleep_duration = 5
+
+        while True:
+            pending = sub.pending_msgs
+            info(f"Got {pending} messages pending")
+            if pending == 0:
+                if self.until_done:
+                    return
+                info(f"Sleeping for {sleep_duration}s")
+                await asyncio.sleep(sleep_duration)
+                continue
+
+            msg = await sub.next_msg()
+            info(msg)
+            # await msg.ack()
+            data = msg.data.decode()
+
             try:
-                await self.add_audio(task.video_id, task.file_path)
+                if self.task_kind == 'diffusion' or self.task_kind == 'upscale':
+                    await base_cb(data)
+
+                if self.task_kind == 'video':
+                    await video_cb(data)
+
+                if self.task_kind == 'audio':
+                    await audio_cb(data)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
-            finally:
-                info(f"Finished {task.json()}")
-
-        if self.task_kind == 'diffusion' or self.task_kind == 'upscale':
-            await js.subscribe(queue, queue, cb=base_cb)
-
-        if self.task_kind == 'video':
-            await js.subscribe(queue, queue, cb=video_cb)
-
-        if self.task_kind == 'audio':
-            await js.subscribe(queue, queue, cb=audio_cb)
-
-        info(f"Started loop for {queue}")
 
     def run(self):
         if self.task_kind == 'diffusion':
@@ -116,7 +120,6 @@ class Worker:
 
         loop = asyncio.new_event_loop()
         loop.run_until_complete(self.loop())
-        loop.run_forever()
         loop.close()
 
     @run_in_executor
