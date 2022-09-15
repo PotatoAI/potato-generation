@@ -95,8 +95,6 @@ class Worker:
                 continue
 
             msg = await sub.next_msg()
-            info(msg)
-            # await msg.ack()
             data = msg.data.decode()
 
             try:
