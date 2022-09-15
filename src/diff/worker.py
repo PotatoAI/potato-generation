@@ -89,6 +89,7 @@ class Worker:
             info(f"Got {pending} messages pending")
             if pending == 0:
                 if self.until_done:
+                    info(f"No tasks, running until done, quitting now!")
                     return
                 info(f"Sleeping for {sleep_duration}s")
                 await asyncio.sleep(sleep_duration)
