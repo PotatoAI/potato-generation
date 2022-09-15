@@ -1,6 +1,7 @@
 import diff.db
 import diff.schema
 import diff.graphql
+from diff.nats import add_stream
 from diff.login import login
 from diff.worker import Worker
 from diff.config import config
@@ -35,9 +36,8 @@ def repl(args):
     IPython.embed()
 
 
-def wip(args):
-    w = diff.worker.SlideshowWorker(config())
-    w.generate()
+def setup_tool(args):
+    add_stream(config().nats)
 
 
 def server(args):
@@ -76,7 +76,7 @@ parser_repl = subparsers.add_parser('repl', help='Drop into REPL')
 parser_server = subparsers.add_parser('server', help='Run Flask server')
 parser_export_graphql_schema = subparsers.add_parser('export-graphql-schema',
                                                      help='Run Flask server')
-parser_wip = subparsers.add_parser('wip', help='Run Flask server')
+parser_setup = subparsers.add_parser('setup', help='Setup some stuff')
 
 parser_worker.add_argument(
     '--until-done',
@@ -101,7 +101,7 @@ parser_migrate.set_defaults(func=migrate)
 parser_repl.set_defaults(func=repl)
 parser_server.set_defaults(func=server)
 parser_export_graphql_schema.set_defaults(func=export_graphql_schema)
-parser_wip.set_defaults(func=wip)
+parser_setup.set_defaults(func=setup_tool)
 
 args = parser.parse_args()
 

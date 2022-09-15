@@ -30,8 +30,8 @@ repl: config.yaml
 server: config.yaml
 	$(MAIN) server
 
-wip: config.yaml
-	$(MAIN) wip
+setup: config.yaml
+	$(MAIN) setup
 
 ui/src/graphql/schema.schema: config.yaml
 	echo $(MAIN) export-graphql-schema

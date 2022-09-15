@@ -17,6 +17,7 @@ from diff.schema import Request as RequestModel, Image as ImageModel, Video as V
 from diff.messages import GenVideoTask, AddAudioTask
 from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, schedule_request, deselect_images, select_images, read_binary_file, get_request, schedule_task, get_images
 from diff.config import config
+from diff.nats import nats_connect
 from base64 import b64decode
 from typing import List
 
@@ -90,7 +91,7 @@ class Query(graphene.ObjectType):
 
 
 async def mutate_async(info, prompt, count) -> RequestModel:
-    nc = await nats.connect(config().nats.url())
+    nc = await nats_connect(config().nats.url())
     return await add_new_request(nc, prompt, count=count)
 
 
@@ -110,7 +111,7 @@ class CreateRequest(graphene.Mutation):
 
 async def do_action_async(info, ids, action, model, metadata) -> bool:
     ok = True
-    nc = await nats.connect(config().nats.url())
+    nc = await nats_connect(config().nats.url())
 
     real_ids = list(map(real_id, ids))
 

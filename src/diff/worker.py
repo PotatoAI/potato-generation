@@ -13,6 +13,7 @@ from diff.gen import Generator
 from diff.upscale import Upscaler
 from diff.storage import save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
 from diff.messages import BaseTask, GenVideoTask, AddAudioTask
+from diff.nats import nats_connect
 from logging import info, error
 from dataclasses import dataclass
 
@@ -49,14 +50,12 @@ class Worker:
         return f"durable-{self.task_kind}"
 
     async def nats_connect(self):
-        info("Connecting to NATS")
-        self.nc = await nats.connect(self.nats_config.url())
+        self.nc = await nats_connect(self.nats_config.url())
 
     async def loop(self):
         await self.nats_connect()
         queue = self.queue()
         js = self.nc.jetstream()
-        await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
 
         async def base_cb(data):
             await msg.ack()
