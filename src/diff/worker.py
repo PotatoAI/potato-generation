@@ -86,7 +86,6 @@ class Worker:
         sub = await js.subscribe(subject=queue,
                                  durable=self.durable_name(),
                                  stream=self.stream_name())
-        info(sub.consumer_info)
         info(f"Started loop for {queue}")
         sleep_duration = 2
 
