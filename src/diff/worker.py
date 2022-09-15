@@ -46,6 +46,9 @@ class Worker:
     def queue(self) -> str:
         return f"tasks-{self.task_kind}"
 
+    def stream_name(self) -> str:
+        return f"tasks-stream-{self.queue()}"
+
     def durable_name(self) -> str:
         return f"durable-{self.task_kind}"
 
@@ -79,9 +82,13 @@ class Worker:
             info(f"Task in audio_cb: {task.json()}")
             await self.add_audio(task.video_id, task.file_path)
 
-        sub = await js.subscribe(queue, self.durable_name())
+        info(f"Subscribing NATS for {queue}")
+        sub = await js.subscribe(subject=queue,
+                                 durable=self.durable_name(),
+                                 stream=self.stream_name())
+        info(sub.consumer_info)
         info(f"Started loop for {queue}")
-        sleep_duration = 5
+        sleep_duration = 2
 
         while True:
             pending = sub.pending_msgs

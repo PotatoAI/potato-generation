@@ -53,9 +53,10 @@ def commit():
 
 async def schedule_task(nc, kind: str, task):
     queue = f"tasks-{kind}"
+    stream = f"tasks-stream-{queue}"
     js = nc.jetstream()
     info(f"===> Scheduling task {task.json()} to {queue}")
-    await js.publish(queue, task.json().encode())
+    await js.publish(queue, task.json().encode(), stream=stream)
 
 
 async def schedule_request(nc, rid: int, kind: str = "diffusion"):

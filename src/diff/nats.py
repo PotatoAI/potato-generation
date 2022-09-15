@@ -18,8 +18,9 @@ async def _setup_stream(url: str):
 
     for q in queues:
         queue = f"tasks-{q}"
-        info(f"Setting up NATS stream for {queue}")
-        await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
+        stream = f"tasks-stream-{queue}"
+        info(f"Setting up NATS stream for {stream} and subject {queue}")
+        await js.add_stream(name=stream, subjects=[queue])
 
 
 def add_stream(cfg: NatsConfig):
