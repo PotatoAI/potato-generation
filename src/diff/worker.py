@@ -6,6 +6,7 @@ import traceback
 import asyncio
 import nats
 import json
+import functools
 from typing import List
 from diff.config import GenConfig, NatsConfig, VideoConfig
 from diff.gen import Generator
@@ -20,6 +21,15 @@ def resize_img(in_file: str, out_file: str, scale: str = "512x512"):
     command = f"convert -resize {scale} {in_file} {out_file}"
     info(command)
     os.system(command)
+
+
+def run_in_executor(f):
+    @functools.wraps(f)
+    def inner(*args, **kwargs):
+        loop = asyncio.get_running_loop()
+        return loop.run_in_executor(None, lambda: f(*args, **kwargs))
+
+    return inner
 
 
 @dataclass
@@ -52,9 +62,9 @@ class Worker:
             await msg.ack()
             try:
                 if task.kind == 'diffusion':
-                    self.diffusion(task.request_id)
+                    await self.diffusion(task.request_id)
                 if task.kind == 'upscale':
-                    self.upscale(task.request_id)
+                    await self.upscale(task.request_id)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
@@ -65,7 +75,7 @@ class Worker:
             info(f"Task: {task.json()}")
             await msg.ack()
             try:
-                self.make_video(task.request_id)
+                await self.make_video(task.request_id)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
@@ -76,7 +86,7 @@ class Worker:
             info(f"Task: {task.json()}")
             await msg.ack()
             try:
-                self.add_audio(task.video_id, task.file_path)
+                await self.add_audio(task.video_id, task.file_path)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
@@ -103,6 +113,7 @@ class Worker:
         loop.run_forever()
         loop.close()
 
+    @run_in_executor
     def diffusion(self, rid: int):
         try:
             request = get_request(rid)
@@ -132,6 +143,7 @@ class Worker:
         finally:
             commit()
 
+    @run_in_executor
     def upscale(self, rid: int):
         try:
             request = get_request(rid)
@@ -147,6 +159,7 @@ class Worker:
         finally:
             commit()
 
+    @run_in_executor
     def make_video(self, rid: int):
         req = get_request(rid)
         print(req)
@@ -197,6 +210,7 @@ class Worker:
         os.system(command)
         save_video(out, req.id)
 
+    @run_in_executor
     def add_audio(self, vid: int, audio_file: str):
         vid = get_videos([vid])[0]
         folder = "output/videos"
