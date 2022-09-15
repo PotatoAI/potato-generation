@@ -251,7 +251,7 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
           onClick={reRunSelected}
           color="warning"
         >
-          Re-Run
+          Run
         </Button>
         <Button
           disabled={selected.length === 0}
