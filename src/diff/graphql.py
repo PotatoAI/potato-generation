@@ -113,7 +113,8 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
 
     real_ids = list(map(real_id, ids))
 
-    logging.info(f"Running {action} action on {model} {real_ids}")
+    logging.info(
+        f"Running {action} action on {model} {real_ids} -> {metadata}")
 
     if action == 'approve' and model == 'request':
         approve_requests(real_ids)
