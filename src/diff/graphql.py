@@ -9,6 +9,7 @@ import logging
 import base64
 import asyncio
 import nats
+import uuid
 from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
@@ -122,13 +123,15 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
 
     if action == 'generate-video' and model == 'request':
         for rid in real_ids:
-            task = GenVideoTask(request_id=rid)
+            uid = str(uuid.uuid1())
+            task = GenVideoTask(uid=uid, request_id=rid)
             await schedule_task(nc, "video", task)
         return ok
 
     if action == 'add-audio' and model == 'video':
         for vid in real_ids:
-            task = AddAudioTask(video_id=vid, file_path=metadata[0])
+            uid = str(uuid.uuid1())
+            task = AddAudioTask(uid=uid, video_id=vid, file_path=metadata[0])
             await schedule_task(nc, "audio", task)
         return ok
 

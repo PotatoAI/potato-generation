@@ -9,6 +9,7 @@ from typing import List
 import diff.db
 import nats
 import asyncio
+import uuid
 
 db_engine: Engine
 db_session: scoped_session
@@ -59,7 +60,8 @@ async def schedule_task(nc, kind: str, task):
 
 
 async def schedule_request(nc, rid: int, kind: str = "diffusion"):
-    task = BaseTask(request_id=rid, kind=kind)
+    uid = str(uuid.uuid1())
+    task = BaseTask(uid=uid, request_id=rid, kind=kind)
     await schedule_task(nc, kind, task)
 
 
