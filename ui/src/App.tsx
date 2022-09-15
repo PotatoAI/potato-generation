@@ -183,7 +183,7 @@ const RequestsDataGrid = (props: { portalRef: MutableRefObject<null> }) => {
       model: "request",
       metadata: [count],
     });
-    await refresh({ requestPolicy: "network-only" });
+    /* await refresh({ requestPolicy: "network-only" }); */
   };
 
   const copySelected = async () => {
