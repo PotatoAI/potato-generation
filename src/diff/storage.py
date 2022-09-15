@@ -54,9 +54,8 @@ async def schedule_task(nc, kind: str, task):
     queue = f"tasks-{kind}"
     js = nc.jetstream()
     await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
-    info(f"Scheduling task {task.json()} to {queue}")
-    ack = await js.publish(queue, task.json().encode())
-    info(ack)
+    info(f"===> Scheduling task {task.json()} to {queue}")
+    await js.publish(queue, task.json().encode())
 
 
 async def schedule_request(nc, rid: int, kind: str = "diffusion"):
