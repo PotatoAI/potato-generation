@@ -56,10 +56,10 @@ class Worker:
         await js.add_stream(name=f"tasks-stream-{queue}", subjects=[queue])
 
         async def base_cb(msg):
+            await msg.ack()
             data = msg.data.decode()
             task = BaseTask(**json.loads(data))
             info(f"Task: {task.json()}")
-            await msg.ack()
             try:
                 if task.kind == 'diffusion':
                     await self.diffusion(task.request_id)
@@ -70,10 +70,10 @@ class Worker:
                 traceback.print_exc()
 
         async def video_cb(msg):
+            await msg.ack()
             data = msg.data.decode()
             task = GenVideoTask(**json.loads(data))
             info(f"Task: {task.json()}")
-            await msg.ack()
             try:
                 await self.make_video(task.request_id)
             except Exception as e:
@@ -81,10 +81,10 @@ class Worker:
                 traceback.print_exc()
 
         async def audio_cb(msg):
+            await msg.ack()
             data = msg.data.decode()
             task = AddAudioTask(**json.loads(data))
             info(f"Task: {task.json()}")
-            await msg.ack()
             try:
                 await self.add_audio(task.video_id, task.file_path)
             except Exception as e:
