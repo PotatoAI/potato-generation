@@ -50,7 +50,8 @@ class Worker:
         return f"tasks-stream-{self.queue()}"
 
     def durable_name(self) -> str:
-        return f"durable-{self.task_kind}"
+        hostname = socket.gethostname()
+        return f"durable-{self.task_kind}-{hostname}"
 
     async def nats_connect(self):
         self.nc = await nats_connect(self.nats_config.url())
