@@ -60,16 +60,15 @@ class Worker:
         queue = self.queue()
         js = self.nc.jetstream()
 
-        async def base_cb(data):
-            await msg.ack()
-            data = msg.data.decode()
+        async def diffusion_cb(data):
             task = BaseTask(**json.loads(data))
-            info(f"Task in base_cb: {task.json()}")
+            info(f"Task in diffusion_cb: {task.json()}")
+            await self.diffusion(task.request_id)
 
-            if task.kind == 'diffusion':
-                await self.diffusion(task.request_id)
-            if task.kind == 'upscale':
-                await self.upscale(task.request_id)
+        async def upscale_cb(data):
+            task = BaseTask(**json.loads(data))
+            info(f"Task in upscale_cb: {task.json()}")
+            await self.upscale(task.request_id)
 
         async def video_cb(data):
             task = GenVideoTask(**json.loads(data))
@@ -105,12 +104,12 @@ class Worker:
             data = msg.data.decode()
 
             try:
-                if self.task_kind == 'diffusion' or self.task_kind == 'upscale':
-                    await base_cb(data)
-
+                if self.task_kind == 'diffusion':
+                    await diffusion_cb(data)
+                if self.task_kind == 'upscale':
+                    await upscale_cb(data)
                 if self.task_kind == 'video':
                     await video_cb(data)
-
                 if self.task_kind == 'audio':
                     await audio_cb(data)
             except Exception as e:
