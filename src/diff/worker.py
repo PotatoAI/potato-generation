@@ -55,31 +55,30 @@ class Worker:
     async def nats_connect(self):
         self.nc = await nats_connect(self.nats_config.url())
 
+    async def diffusion_cb(self, data):
+        task = BaseTask(**json.loads(data))
+        info(f"Task in diffusion_cb: {task.json()}")
+        await self.diffusion(task.request_id)
+
+    async def upscale_cb(self, data):
+        task = BaseTask(**json.loads(data))
+        info(f"Task in upscale_cb: {task.json()}")
+        await self.upscale(task.request_id)
+
+    async def video_cb(self, data):
+        task = GenVideoTask(**json.loads(data))
+        info(f"Task in video_cb: {task.json()}")
+        await self.make_video(task.request_id)
+
+    async def audio_cb(self, data):
+        task = AddAudioTask(**json.loads(data))
+        info(f"Task in audio_cb: {task.json()}")
+        await self.add_audio(task.video_id, task.file_path)
+
     async def loop(self):
         await self.nats_connect()
         queue = self.queue()
         js = self.nc.jetstream()
-
-        async def diffusion_cb(data):
-            task = BaseTask(**json.loads(data))
-            info(f"Task in diffusion_cb: {task.json()}")
-            await self.diffusion(task.request_id)
-
-        async def upscale_cb(data):
-            task = BaseTask(**json.loads(data))
-            info(f"Task in upscale_cb: {task.json()}")
-            await self.upscale(task.request_id)
-
-        async def video_cb(data):
-            task = GenVideoTask(**json.loads(data))
-            info(f"Task in video_cb: {task.json()}")
-
-            await self.make_video(task.request_id)
-
-        async def audio_cb(data):
-            task = AddAudioTask(**json.loads(data))
-            info(f"Task in audio_cb: {task.json()}")
-            await self.add_audio(task.video_id, task.file_path)
 
         info(f"Subscribing NATS for {queue}")
         sub = await js.subscribe(subject=queue,
@@ -105,13 +104,13 @@ class Worker:
 
             try:
                 if self.task_kind == 'diffusion':
-                    await diffusion_cb(data)
+                    await self.diffusion_cb(data)
                 if self.task_kind == 'upscale':
-                    await upscale_cb(data)
+                    await self.upscale_cb(data)
                 if self.task_kind == 'video':
-                    await video_cb(data)
+                    await self.video_cb(data)
                 if self.task_kind == 'audio':
-                    await audio_cb(data)
+                    await self.audio_cb(data)
             except Exception as e:
                 error(e)
                 traceback.print_exc()
