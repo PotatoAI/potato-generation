@@ -109,15 +109,22 @@ def approve_requests(ids: List[int]):
 
 
 def delete_requests(ids: List[int]):
+    info(f"Deleting requests {ids}")
+    requests = db_session.query(Request).filter(Request.id.in_(ids)).all()
+    for req in requests:
+        delete_images(list(map(lambda img: img.id, req.images)))
     db_session.query(Request).filter(Request.id.in_(ids)).delete()
     db_session.commit()
 
 
 def delete_images(ids: List[int]):
+    info(f"Deleting images {ids}")
     records = db_session.query(Image).filter(Image.id.in_(ids)).all()
     for rec in records:
         try:
             delete_binary_file(rec.oid)
+            if rec.hqoid:
+                delete_binary_file(rec.hqoid)
         except Exception as e:
             error(e)
         finally:

@@ -101,6 +101,7 @@ class Worker:
                 continue
 
             msg = await sub.next_msg()
+            await msg.in_progress()
             data = msg.data.decode()
 
             try:
@@ -115,6 +116,9 @@ class Worker:
             except Exception as e:
                 error(e)
                 traceback.print_exc()
+            finally:
+                if not msg._ackd:
+                    await msg.ack_sync()
 
     def run(self):
         if self.task_kind == 'diffusion':
