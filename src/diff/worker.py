@@ -82,13 +82,19 @@ class Worker:
         js = self.nc.jetstream()
 
         info(f"Subscribing NATS for {queue}")
-        sub = await js.subscribe(subject=queue,
-                                 durable=self.durable_name(),
-                                 stream=self.stream_name())
+        sub = await js.pull_subscribe(subject=queue,
+                                      durable=self.durable_name(),
+                                      stream=self.stream_name())
         info(f"Started loop for {queue}")
         sleep_duration = 2
 
         while True:
+            msgs = []
+            try:
+                msgs = await sub.fetch(1)
+            except Exception as e:
+                error(f"Fetch error: {e}")
+
             pending = sub.pending_msgs
             info(f"Got {pending} messages pending")
             if pending == 0:
@@ -99,8 +105,8 @@ class Worker:
                 await asyncio.sleep(sleep_duration)
                 continue
 
-            msg = await sub.next_msg()
             # await msg.in_progress()
+            msg = msgs[0]
             if not msg._ackd:
                 await msg.ack_sync()
             data = msg.data.decode()
