@@ -92,7 +92,10 @@ class Query(graphene.ObjectType):
 
 async def mutate_async(info, prompt, count) -> RequestModel:
     nc = await nats_connect(config().nats.url())
-    return await add_new_request(nc, prompt, count=count)
+    res = await add_new_request(nc, prompt, count=count)
+    await nc.flush(timeout=1)
+    await nc.close()
+    return res
 
 
 class CreateRequest(graphene.Mutation):
@@ -104,7 +107,9 @@ class CreateRequest(graphene.Mutation):
     request = graphene.Field(lambda: Request)
 
     def mutate(self, info, prompt, count):
-        request = asyncio.run(mutate_async(info, prompt, count))
+        loop = asyncio.new_event_loop()
+        request = loop.run_until_complete(mutate_async(info, prompt, count))
+        loop.close()
         ok = True
         return CreateRequest(request=request, ok=ok)
 
@@ -179,6 +184,8 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
         return ok
 
     logging.error(f"Unknown action {action} for model {model}")
+    await nc.flush(timeout=1)
+    await nc.close()
     return False
 
 
@@ -192,7 +199,10 @@ class DoAction(graphene.Mutation):
     ok = graphene.Boolean()
 
     def mutate(self, info, ids, action, model, metadata):
-        ok = asyncio.run(do_action_async(info, ids, action, model, metadata))
+        loop = asyncio.new_event_loop()
+        ok = loop.run_until_complete(
+            do_action_async(info, ids, action, model, metadata))
+        loop.close()
         return DoAction(ok=ok)
 
 
