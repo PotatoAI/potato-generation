@@ -14,8 +14,8 @@ from datetime import datetime
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from diff.schema import Request as RequestModel, Image as ImageModel, Video as VideoModel
-from diff.messages import GenVideoTask, AddAudioTask
-from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, schedule_request, deselect_images, select_images, read_binary_file, get_request, schedule_task, get_images
+from diff.messages import DiffusionTask, UpscaleTask, GenVideoTask, AddAudioTask
+from diff.storage import add_new_request, approve_requests, delete_requests, delete_images, delete_videos, deselect_images, select_images, read_binary_file, get_request, schedule_task, get_images
 from diff.config import config
 from diff.nats import nats_connect
 from base64 import b64decode
@@ -131,14 +131,14 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
         for rid in real_ids:
             uid = str(uuid.uuid1())
             task = GenVideoTask(uid=uid, request_id=rid)
-            await schedule_task(nc, "video", task)
+            await schedule_task(nc, task)
         return ok
 
     if action == 'add-audio' and model == 'video':
         for vid in real_ids:
             uid = str(uuid.uuid1())
             task = AddAudioTask(uid=uid, video_id=vid, file_path=metadata[0])
-            await schedule_task(nc, "audio", task)
+            await schedule_task(nc, task)
         return ok
 
     if action == 'delete':
@@ -162,7 +162,11 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
 
     if action == 'upscale' and model == 'request':
         for rid in real_ids:
-            await schedule_request(nc, rid, kind='upscale')
+            request = get_request(rid)
+            for img in request.images:
+                uid = str(uuid.uuid1())
+                task = UpscaleTask(uid=uid, image_id=img.id)
+                await schedule_task(nc, task)
         return ok
 
     if action == 're-run':
@@ -172,7 +176,9 @@ async def do_action_async(info, ids, action, model, metadata) -> bool:
                 count = int(metadata[0])
             for _ in range(count):
                 for rid in real_ids:
-                    await schedule_request(nc, rid, kind='diffusion')
+                    uid = str(uuid.uuid1())
+                    task = DiffusionTask(uid=uid, request_id=rid)
+                    await schedule_task(nc, task)
             return ok
 
     if action == 'select' and model == 'image':

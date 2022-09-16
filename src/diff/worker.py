@@ -12,7 +12,7 @@ from diff.config import GenConfig, NatsConfig, VideoConfig
 from diff.gen import Generator
 from diff.upscale import Upscaler
 from diff.storage import save_image, commit, get_request, read_binary_file, save_video, get_selected_images_for_request, get_videos
-from diff.messages import BaseTask, GenVideoTask, AddAudioTask
+from diff.messages import DiffusionTask, UpscaleTask, GenVideoTask, AddAudioTask
 from diff.nats import nats_connect
 from logging import info, error
 from dataclasses import dataclass
@@ -56,14 +56,14 @@ class Worker:
         self.nc = await nats_connect(self.nats_config.url())
 
     async def diffusion_cb(self, data):
-        task = BaseTask(**json.loads(data))
+        task = DiffusionTask(**json.loads(data))
         info(f"Task in diffusion_cb: {task.json()}")
         await self.diffusion(task.request_id)
 
     async def upscale_cb(self, data):
-        task = BaseTask(**json.loads(data))
+        task = UpscaleTask(**json.loads(data))
         info(f"Task in upscale_cb: {task.json()}")
-        await self.upscale(task.request_id)
+        await self.upscale(task.image_id)
 
     async def video_cb(self, data):
         task = GenVideoTask(**json.loads(data))
@@ -159,15 +159,12 @@ class Worker:
             commit()
 
     @run_in_executor
-    def upscale(self, rid: int):
+    def upscale(self, img_id: int):
         try:
-            request = get_request(rid)
-            info(f"Upscale for request#{rid} \"{request.prompt}\"")
+            info(f"Upscale for image#{img_id}")
 
             if self.upscaler:
-                self.upscaler.upscale(rid=rid)
-
-            request.generated = True
+                self.upscaler.upscale(img_id=img_id)
         except Exception as e:
             error(e)
             traceback.print_exc()

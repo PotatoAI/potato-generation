@@ -1,5 +1,5 @@
 from diff.schema import Request, Image, Video
-from diff.messages import BaseTask
+from diff.messages import DiffusionTask
 from sqlalchemy import desc
 from logging import info, error
 from sqlalchemy.orm import scoped_session
@@ -51,18 +51,13 @@ def commit():
     db_session.commit()
 
 
-async def schedule_task(nc, kind: str, task):
+async def schedule_task(nc, task):
+    kind = task.kind
     queue = f"tasks-{kind}"
     stream = f"tasks-stream-{queue}"
     js = nc.jetstream()
     info(f"===> Scheduling task {task.json()} to {queue}")
     await js.publish(queue, task.json().encode(), stream=stream)
-
-
-async def schedule_request(nc, rid: int, kind: str = "diffusion"):
-    uid = str(uuid.uuid1())
-    task = BaseTask(uid=uid, request_id=rid, kind=kind)
-    await schedule_task(nc, kind, task)
 
 
 async def add_new_request(
@@ -82,7 +77,9 @@ async def add_new_request(
     db_session.commit()
     info(f"Created new request {req.id}")
     for _ in range(count):
-        await schedule_request(nc, rid=req.id, kind=kind)
+        uid = str(uuid.uuid1())
+        task = DiffusionTask(uid=uid, request_id=rid)
+        await schedule_task(nc, task)
     return req
 
 
@@ -181,6 +178,10 @@ def get_selected_images_for_request(rid: int) -> List[Image]:
         Image.request_id == rid,
         Image.selected == True,
     ).all()
+
+
+def get_image(id: int) -> Image:
+    return db_session.query(Image).filter(Image.id == id).one()
 
 
 def get_images(ids: List[int]) -> List[Image]:

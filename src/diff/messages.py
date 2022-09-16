@@ -1,9 +1,15 @@
 from pydantic import BaseModel
 
 
-class BaseTask(BaseModel):
+class DiffusionTask(BaseModel):
     uid: str
     request_id: int
+    kind: str = 'diffusion'
+
+
+class UpscaleTask(BaseModel):
+    uid: str
+    image_id: int
     kind: str = 'upscale'
 
 
