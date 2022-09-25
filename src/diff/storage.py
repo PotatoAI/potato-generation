@@ -78,7 +78,7 @@ async def add_new_request(
     info(f"Created new request {req.id}")
     for _ in range(count):
         uid = str(uuid.uuid1())
-        task = DiffusionTask(uid=uid, request_id=rid)
+        task = DiffusionTask(uid=uid, request_id=req.id)
         await schedule_task(nc, task)
     return req
 
