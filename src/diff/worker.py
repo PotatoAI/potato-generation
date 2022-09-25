@@ -92,7 +92,7 @@ class Worker:
             msgs = []
 
             try:
-                msgs = await sub.fetch()
+                msgs = await sub.fetch(1)
             except Exception as e:
                 error(f"Fetch error: {e}")
                 if self.until_done:
