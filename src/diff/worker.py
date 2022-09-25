@@ -90,14 +90,11 @@ class Worker:
 
         while True:
             msgs = []
+
             try:
-                msgs = await sub.fetch(1)
+                msgs = await sub.fetch()
             except Exception as e:
                 error(f"Fetch error: {e}")
-
-            pending = sub.pending_msgs
-            info(f"Got {pending} messages pending")
-            if pending == 0:
                 if self.until_done:
                     info(f"No tasks, running until done, quitting now!")
                     return
