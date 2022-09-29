@@ -10,7 +10,7 @@ Base = declarative_base()
 class Request(Base):
     __tablename__ = 'requests'
     id = Column(Integer(), primary_key=True)
-    prompt = Column(String(200), nullable=False)
+    prompt = Column(Text(), nullable=False)
     priority = Column(Integer(), default=0)
     approved = Column(Boolean(), default=False)
     generated = Column(Boolean(), default=False)
