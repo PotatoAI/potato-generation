@@ -13,7 +13,6 @@ from diff.image_result import ImagesResult
 
 class NoCheck(ModelMixin):
     """Can be used in place of safety checker. Use responsibly and at your own risk."""
-
     def __init__(self):
         super().__init__()
         self.register_parameter(name='asdf',
@@ -24,7 +23,6 @@ class NoCheck(ModelMixin):
 
 
 class Generator:
-
     def __init__(self, small_vram: bool):
         info('Initializing pipeline')
         pipe = StableDiffusionPipeline.from_pretrained(
@@ -37,6 +35,7 @@ class Generator:
         info('Moving pipeline to CUDA')
         self.pipe = pipe.to("cuda")
         if small_vram:
+            info('Enabling attention slicing for smaller VRAM usage')
             pipe.enable_attention_slicing()
 
     def generate(self,
