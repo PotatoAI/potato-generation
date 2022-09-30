@@ -7,7 +7,7 @@ from PIL import Image
 from torch import autocast
 from dataclasses import dataclass
 from typing import List, Any
-from logging import info
+from logging import info, warn
 from diff.image_result import ImagesResult
 
 
@@ -19,6 +19,7 @@ class NoCheck(ModelMixin):
                                 param=torch.nn.Parameter(torch.randn(3)))
 
     def forward(self, images=None, **kwargs):
+        warn('Bypassing NSFW filter')
         return images, [False]
 
 
