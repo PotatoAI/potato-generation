@@ -6,7 +6,6 @@ authors = ["Max Gonzih <gonzih@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-diffusers = {git = "https://github.com/PotatoAI/diffusers.git", rev = "no-filter"}
 transformers = "^4.21.2"
 scipy = "^1.9.1"
 ftfy = "^6.1.1"
@@ -23,6 +22,7 @@ Flask-GraphQL = "^2.0.1"
 Flask-Cors = "^3.0.10"
 alembic = "^1.8.1"
 nats-py = "^2.1.7"
+diffusers = "^0.3.0"
 
 [tool.mypy]
 ignore_missing_imports = true

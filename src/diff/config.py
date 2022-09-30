@@ -19,6 +19,7 @@ class DBConfig(BaseModel):
 
 
 class GenConfig(BaseModel):
+    small_vram: bool = False
     batch_size: int
     batch_count: int
     inference_steps: int

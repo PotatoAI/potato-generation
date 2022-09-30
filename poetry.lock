@@ -113,16 +113,15 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "diffusers"
-version = "0.2.4"
+version = "0.3.0"
 description = "Diffusers"
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
-develop = false
 
 [package.dependencies]
 filelock = "*"
-huggingface-hub = ">=0.8.1,<1.0"
+huggingface-hub = ">=0.8.1"
 importlib-metadata = "*"
 numpy = "*"
 Pillow = "*"
@@ -131,17 +130,11 @@ requests = "*"
 torch = ">=1.4"
 
 [package.extras]
-dev = ["black (==22.3)", "isort (>=5.5.4)", "flake8 (>=3.8.3)", "hf-doc-builder", "pytest", "pytest-timeout", "pytest-xdist", "accelerate", "datasets", "tensorboard", "modelcards"]
+training = ["modelcards", "tensorboard", "datasets", "accelerate"]
+test = ["transformers", "scipy", "pytest-xdist", "pytest-timeout", "pytest", "onnxruntime", "datasets"]
+quality = ["hf-doc-builder", "flake8 (>=3.8.3)", "isort (>=5.5.4)", "black (==22.3)"]
 docs = ["hf-doc-builder"]
-quality = ["black (==22.3)", "isort (>=5.5.4)", "flake8 (>=3.8.3)", "hf-doc-builder"]
-test = ["pytest", "pytest-timeout", "pytest-xdist"]
-training = ["accelerate", "datasets", "tensorboard", "modelcards"]
-
-[package.source]
-type = "git"
-url = "https://github.com/PotatoAI/diffusers.git"
-reference = "no-filter"
-resolved_reference = "bf671ef8b0ce85571c807b8d7c020ec10635a34b"
+dev = ["modelcards", "tensorboard", "accelerate", "transformers", "scipy", "pytest-xdist", "pytest-timeout", "pytest", "onnxruntime", "datasets", "hf-doc-builder", "flake8 (>=3.8.3)", "isort (>=5.5.4)", "black (==22.3)"]
 
 [[package]]
 name = "executing"
@@ -943,7 +936,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.12"
-content-hash = "5c716caef5fd9bc5429c35656e3fb4db3f7426af60578c481dabaea0e98e71f4"
+content-hash = "b4358a53930a0473809262ad08293151a301aa2db84632c13a9bd3bb992a6374"
 
 [metadata.files]
 alembic = [
@@ -990,7 +983,10 @@ decorator = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
 ]
-diffusers = []
+diffusers = [
+    {file = "diffusers-0.3.0-py3-none-any.whl", hash = "sha256:191612381924c25bb2462a7e68ebca5dca6c5b6b02a478865b473c9dee7991be"},
+    {file = "diffusers-0.3.0.tar.gz", hash = "sha256:416c92fa5d16c0daf95d2031b902cfb42a9dc28dbd5ecea1c566205a4c8ad8df"},
+]
 executing = [
     {file = "executing-1.0.0-py2.py3-none-any.whl", hash = "sha256:550d581b497228b572235e633599133eeee67073c65914ca346100ad56775349"},
     {file = "executing-1.0.0.tar.gz", hash = "sha256:98daefa9d1916a4f0d944880d5aeaf079e05585689bebd9ff9b32e31dd5e1017"},

@@ -25,6 +25,7 @@ def resize_img(in_file: str, out_file: str, scale: str = "512x512"):
 
 
 def run_in_executor(f):
+
     @functools.wraps(f)
     def inner(*args, **kwargs):
         loop = asyncio.get_running_loop()
@@ -123,7 +124,7 @@ class Worker:
 
     def run(self):
         if self.task_kind == 'diffusion':
-            self.generator = Generator()
+            self.generator = Generator(self.gen_config.small_vram)
         if self.task_kind == 'upscale':
             self.upscaler = Upscaler()
 
