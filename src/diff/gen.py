@@ -32,12 +32,11 @@ class Generator:
             torch_dtype=torch.float16,
             use_auth_token=True)
         pipe.safety_checker = NoCheck()
-        pipe.bypass_nsfw_filter = True
         info('Moving pipeline to CUDA')
         self.pipe = pipe.to("cuda")
         if small_vram:
             info('Enabling attention slicing for smaller VRAM usage')
-            pipe.enable_attention_slicing()
+            self.pipe.enable_attention_slicing()
 
     def generate(self,
                  prompt_str: str,
